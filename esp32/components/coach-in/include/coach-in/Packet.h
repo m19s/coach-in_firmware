@@ -1,8 +1,5 @@
 #pragma once
-#include <StreamLogger/Logger.h>
-using namespace m2d::ESP32;
 
-#include <bitset>
 #include <vector>
 
 namespace m19s
@@ -50,32 +47,27 @@ namespace coach_in
 
 			uint16_t to_16bits_data()
 			{
-				static Logger::Group l("coach_in");
 				uint16_t bytes = 0;
 				uint16_t identifier = this->channel_identifier;
 				bytes |= identifier;
 				bytes <<= 5;
-				l.debug << "--id:" << std::bitset<16>(identifier).to_string() << Logger::endl;
 
 				uint16_t pulse = this->pulse;
 				pulse -= 40;
 				pulse /= 10;
 				bytes |= pulse;
 				bytes <<= 4;
-				l.debug << "--ps:" << std::bitset<16>(pulse).to_string() << Logger::endl;
 
 				uint16_t frequency = this->frequency;
 				frequency -= 50;
 				frequency /= 10;
 				bytes |= frequency;
 				bytes <<= 4;
-				l.debug << "--fq:" << std::bitset<16>(frequency).to_string() << Logger::endl;
 
 				uint16_t duration = this->duration;
 				duration -= 500;
 				duration /= 100;
 				bytes |= duration;
-				l.debug << "--du:" << std::bitset<16>(duration).to_string() << Logger::endl;
 
 				return bytes;
 			}
