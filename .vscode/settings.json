@@ -101,7 +101,8 @@
 		"hash_map": "cpp",
 		"hash_set": "cpp",
 		"charconv": "cpp",
-		"variant": "cpp"
+		"variant": "cpp",
+		"__bit_reference": "cpp"
 	},
 	"C_Cpp.intelliSenseEngineFallback": "Enabled",
 	"C_Cpp.intelliSenseEngine": "Tag Parser",

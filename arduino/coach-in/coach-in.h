@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Arduino_SPI-Stack.h"
 #include <Adafruit_PWMServoDriver.h>
 #include <MultiEMS.h>
 #include <SPI.h>
@@ -18,8 +19,13 @@ namespace coach_in
 			int duration;
 			int frequency;
 			int pulse;
+			bool invalid = false;
 
-			Packet() {}
+			Packet()
+			{
+				this->invalid = true;
+			}
+
 			Packet(uint16_t data)
 			{
 				// 合計2byte。下記データはMSBから順番に並んでる。
@@ -90,9 +96,11 @@ namespace coach_in
 		{
 		private:
 			Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40);
-			SPISettings spi_settings = SPISettings(80000, LSBFIRST, SPI_MODE0);
+			m2d::Arduino::SPI::Stack spi_stack = m2d::Arduino::SPI::Stack(2);
 
 		public:
+			uint16_t last_packet_data = 0;
+
 			MultiEMS_Board()
 			    : rkmtlab::MultiEMS::Board(4)
 			{
@@ -105,7 +113,7 @@ namespace coach_in
 				}
 			}
 
-			bool setPWMFrequency(int frequency)
+			bool set_pwm_frequency(int frequency)
 			{
 				if (frequency >= 33 | frequency <= 720) {
 					pwm.setPWMFreq(frequency);
@@ -115,17 +123,23 @@ namespace coach_in
 				return false;
 			}
 
-			uint16_t update()
+			void process_data(char data)
 			{
-				SPI.beginTransaction(spi_settings);
-				uint16_t dummy = 0xff;
-				uint16_t received_data = SPI.transfer16(dummy);
-				if (received_data > 0) {
-					this->update_channel(Packet(received_data));
-				}
-				SPI.endTransaction();
+				this->spi_stack.process_data(data);
+			}
 
-				return received_data;
+			bool update()
+			{
+				if (this->spi_stack.available()) {
+					uint16_t data = this->spi_stack.buffer[0] << 8;
+					data |= this->spi_stack.buffer[1];
+
+					this->last_packet_data = data;
+
+					this->spi_stack.flush();
+					return this->update_channel(Packet(data));
+				}
+				return false;
 			}
 
 			bool update_channel(Packet p)

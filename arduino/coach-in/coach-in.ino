@@ -3,8 +3,16 @@
 #include <vector>
 
 using namespace std;
+using namespace m19s::coach_in::Arduino;
 
 m19s::coach_in::Arduino::MultiEMS_Board *board;
+
+volatile uint8_t counter = 0;
+ISR(SPI_STC_vect)
+{
+	byte c = SPDR; // grab byte from SPI Data Register
+	board->process_data(c);
+}
 
 void setup()
 {
@@ -31,14 +39,17 @@ void loop()
 		board->driveAll();
 	}
 	else {
-		m19s::coach_in::Arduino::Packet p(board->update());
-		auto v = p.to_byte_vector();
-		Serial.println("Receive data: ");
-		Serial.print(v[0], BIN);
-		Serial.print(" ");
-		Serial.println(v[1], BIN);
+		if (board->update()) {
+			m19s::coach_in::Arduino::Packet p(board->last_packet_data);
+			auto v = p.to_byte_vector();
+			Serial.println("Receive data: ");
+			Serial.print(v[0], BIN);
+			Serial.print(" ");
+			Serial.println(v[1], BIN);
 
-		Serial.println("driveAll");
-		board->driveAll();
+			Serial.println("driveAll");
+			delay(1000);
+			// board->driveAll();
+		}
 	}
 }
