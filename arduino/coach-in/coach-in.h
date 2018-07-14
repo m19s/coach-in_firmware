@@ -111,6 +111,7 @@ namespace coach_in
 				for (int i = 0; i < 4; i++) {
 					pwm.setPWM(i, 0, 4096 / 2.0);
 				}
+				spi_stack.setup(m2d::Arduino::SPI::Stack::Mode3, m2d::Arduino::SPI::Stack::LSBFirst);
 			}
 
 			bool set_pwm_frequency(int frequency)
@@ -131,8 +132,12 @@ namespace coach_in
 			bool update()
 			{
 				if (this->spi_stack.available()) {
+					Serial.println("available:");
 					uint16_t data = this->spi_stack.buffer[0] << 8;
 					data |= this->spi_stack.buffer[1];
+					Serial.print(this->spi_stack.buffer[0], BIN);
+					Serial.print(",");
+					Serial.println(this->spi_stack.buffer[1], BIN);
 
 					this->last_packet_data = data;
 

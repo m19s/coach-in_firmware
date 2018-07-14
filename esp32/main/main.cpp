@@ -18,9 +18,8 @@ using namespace m2d::ESP32;
 void app_main()
 {
 	static Logger::Group logger("coach_in");
-
 	static m2d::FreeRTOS::Task task("EMS task", 10, 1024 * 3, [&] {
-		SPIWrapper spi(4000000, 0, (gpio_num_t)GPIO_NUM_18, (gpio_num_t)GPIO_NUM_23, (gpio_num_t)GPIO_NUM_19, (gpio_num_t)GPIO_NUM_5, VSPI_HOST, (SPI_DEVICE_TXBIT_LSBFIRST | SPI_DEVICE_TXBIT_LSBFIRST));
+		SPIWrapper spi(4000000, 3, (gpio_num_t)GPIO_NUM_18, (gpio_num_t)GPIO_NUM_23, (gpio_num_t)GPIO_NUM_19, (gpio_num_t)GPIO_NUM_5, VSPI_HOST, (SPI_DEVICE_TXBIT_LSBFIRST | SPI_DEVICE_TXBIT_LSBFIRST));
 		while (1) {
 			// 0b000 00001 0001 0001
 			m19s::coach_in::ESP32::Packet packet;
@@ -31,11 +30,14 @@ void app_main()
 
 			auto v = packet.to_byte_vector();
 			uint8_t *data = &v[0];
-
-			logger.debug << std::bitset<8>(v[0]).to_string() << std::bitset<8>(v[1]).to_string() << Logger::endl;
+			logger.debug << std::bitset<8>(data[0]).to_string() << ", " << std::bitset<8>(data[1]).to_string() << Logger::endl;
 
 			m2d::ESP32::SPITransaction t;
-			t.set_tx_buffer(data, 2);
+			// t.set_tx_buffer(data, 2);
+			t.set_tx_buffer(&data[0], 1);
+			assert(spi.transmit(t) == ESP_OK);
+			vTaskDelay(30 / portTICK_PERIOD_MS);
+			t.set_tx_buffer(&data[1], 1);
 			assert(spi.transmit(t) == ESP_OK);
 
 			vTaskDelay(3000 / portTICK_PERIOD_MS);

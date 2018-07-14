@@ -40,13 +40,6 @@ void loop()
 	}
 	else {
 		if (board->update()) {
-			m19s::coach_in::Arduino::Packet p(board->last_packet_data);
-			auto v = p.to_byte_vector();
-			Serial.println("Receive data: ");
-			Serial.print(v[0], BIN);
-			Serial.print(" ");
-			Serial.println(v[1], BIN);
-
 			Serial.println("driveAll");
 			delay(1000);
 			// board->driveAll();
