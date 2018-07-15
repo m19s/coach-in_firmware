@@ -11,13 +11,75 @@ namespace coach_in
 		class Packet
 		{
 		public:
-			int channel_identifier;
+			Packet() {}
+			Packet(uint8_t data){};
+			Packet(uint16_t data){};
+
+			virtual uint8_t to_8bits_data() = 0;
+			virtual uint16_t to_16bits_data() = 0;
+			virtual std::vector<uint8_t> to_byte_vector() = 0;
+		};
+
+		class DrivePacket : public Packet
+		{
+		public:
+			uint8_t channel_identifier;
+			uint8_t delay_ms;
+
+			DrivePacket(uint8_t identifier, uint8_t delay_ms)
+			    : channel_identifier(identifier)
+			    , delay_ms(delay_ms)
+			{
+			}
+
+			DrivePacket(uint8_t data)
+			{
+				this->channel_identifier = data & 0b11100000;
+				this->delay_ms = data & 0b00011111;
+			}
+
+			uint8_t to_8bits_data()
+			{
+				uint8_t data = 0;
+				data = this->channel_identifier;
+				data <<= 5;
+				data |= this->delay_ms;
+
+				return data;
+			}
+
+			uint16_t to_16bits_data()
+			{
+				uint16_t data = (uint16_t)this->to_8bits_data();
+				return data;
+			}
+
+			std::vector<uint8_t> to_byte_vector()
+			{
+				std::vector<uint8_t> v;
+				v.push_back(this->to_8bits_data());
+
+				return v;
+			}
+		};
+
+		class ChannelPacket : public Packet
+		{
+		public:
+			uint8_t channel_identifier;
 			int duration;
 			int frequency;
 			int pulse;
 
-			Packet() {}
-			Packet(uint16_t data)
+			ChannelPacket(uint8_t identifier, int duration, int frequency, int pulse)
+			    : channel_identifier(identifier)
+			    , duration(duration)
+			    , frequency(frequency)
+			    , pulse(pulse)
+			{
+			}
+
+			ChannelPacket(uint16_t data)
 			{
 				// 合計2byte。下記データはMSBから順番に並んでる。
 				// | param     | size | note             |
@@ -43,6 +105,12 @@ namespace coach_in
 				data >>= 5;
 
 				this->channel_identifier = data & 0b00000111;
+			}
+
+			uint8_t to_8bits_data()
+			{
+				assert(true && "No implementation.");
+				return 0;
 			}
 
 			uint16_t to_16bits_data()
