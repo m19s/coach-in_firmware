@@ -1,0 +1,8 @@
+menu "coach-in Component Settings"
+
+config COACH_IN_DEVICE_NAME
+    string "A name of the device."
+	default "DEBUG"
+    help
+	    The name will appear in an app.
+endmenu

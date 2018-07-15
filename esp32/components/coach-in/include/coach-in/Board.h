@@ -3,6 +3,7 @@
 #include <bitset>
 #include <cstdlib>
 #include <functional>
+#include <sdkconfig.h>
 
 #include "./Configuration.h"
 #include "./Packet.h"
