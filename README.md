@@ -1,5 +1,5 @@
 # coach-in firmware
-## arduino
+## Arduino
 ### Dependencies
 - [Arduino_SPI-Stack](https://github.com/0x0c/Arduino_SPI-Stack)
 
