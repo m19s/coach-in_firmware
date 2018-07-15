@@ -5,7 +5,7 @@
 using namespace std;
 using namespace m19s::coach_in::Arduino;
 
-m19s::coach_in::Arduino::MultiEMS_Board *board;
+m19s::coach_in::Arduino::DevKit2 *board;
 
 volatile uint8_t counter = 0;
 ISR(SPI_STC_vect)
@@ -16,7 +16,7 @@ ISR(SPI_STC_vect)
 
 void setup()
 {
-	board = new m19s::coach_in::Arduino::MultiEMS_Board();
+	board = new m19s::coach_in::Arduino::DevKit2();
 	Serial.begin(115200);
 	Serial.println("ready");
 }
@@ -39,10 +39,16 @@ void loop()
 		board->driveAll();
 	}
 	else {
-		if (board->update()) {
-			Serial.println("driveAll");
-			delay(1000);
-			// board->driveAll();
+		DevKit2::UpdateType type = board->update();
+		switch (type) {
+			case None:
+				break;
+			case Drive:
+				Serial.println("drive");
+				break;
+			case Channel:
+				Serial.println("channel");
+				break;
 		}
 	}
 }

@@ -12,21 +12,28 @@ namespace coach_in
 {
 	namespace Arduino
 	{
-		class Packet
+		class DrivePacket
+		{
+		public:
+			int channel_identifier;
+			int delay_ms;
+
+			DrivePacket(uint8_t data)
+			{
+				this->channel_identifier = ((data & 0b11100000) >> 5);
+				this->delay_ms = (data & 0b00011111) * 100;
+			}
+		};
+
+		class ChannelPacket
 		{
 		public:
 			int channel_identifier;
 			int duration;
 			int frequency;
 			int pulse;
-			bool invalid = false;
 
-			Packet()
-			{
-				this->invalid = true;
-			}
-
-			Packet(uint16_t data)
+			ChannelPacket(uint16_t data)
 			{
 				// 合計2byte。下記データはMSBから順番に並んでる。
 				// | param     | size | note             |
@@ -92,17 +99,25 @@ namespace coach_in
 			}
 		};
 
-		class MultiEMS_Board : public rkmtlab::MultiEMS::Board
+		class DevKit2 : public rkmtlab::MultiEMS::Board
 		{
 		private:
 			Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40);
-			m2d::Arduino::SPI::Stack spi_stack = m2d::Arduino::SPI::Stack(2);
+			m2d::Arduino::SPI::Stack spi_stack = m2d::Arduino::SPI::Stack(3);
+			static const int kNumberOfChannels = 4;
 
 		public:
+			typedef enum
+			{
+				None = 0,
+				Drive = 1,
+				Channel = 2
+			} UpdateType;
+
 			uint16_t last_packet_data = 0;
 
-			MultiEMS_Board()
-			    : rkmtlab::MultiEMS::Board(4)
+			DevKit2()
+			    : rkmtlab::MultiEMS::Board(kNumberOfChannels)
 			{
 				pwm.begin();
 				// Supported only 33~720Hz
@@ -129,22 +144,37 @@ namespace coach_in
 				this->spi_stack.process_data(data);
 			}
 
-			bool update()
+			UpdateType update()
 			{
 				if (this->spi_stack.available()) {
-					Serial.println("available:");
-					uint16_t data = this->spi_stack.buffer[0] << 8;
-					data |= this->spi_stack.buffer[1];
+					Serial.print("available: ");
 					Serial.print(this->spi_stack.buffer[0], BIN);
 					Serial.print(",");
-					Serial.println(this->spi_stack.buffer[1], BIN);
+					Serial.print(this->spi_stack.buffer[1], BIN);
+					Serial.print(",");
+					Serial.println(this->spi_stack.buffer[3], BIN);
+
+					uint8_t type = this->spi_stack.buffer[0];
+					if (type == 0) {
+						// drive packet
+						uint16_t data = this->spi_stack.buffer[1];
+						if (this->drive(DrivePacket(data))) {
+							return Drive;
+						}
+					}
+					else if (type == 1) {
+						// channel packet
+						uint16_t data = this->spi_stack.buffer[1] << 8;
+						data |= this->spi_stack.buffer[2];
+						if (this->update_channel(ChannelPacket(data))) {
+							return Channel;
+						}
+					}
 
 					this->last_packet_data = data;
-
 					this->spi_stack.flush();
-					return this->update_channel(Packet(data));
 				}
-				return false;
+				return None;
 			}
 
 			bool update_channel(Packet p)
@@ -154,6 +184,23 @@ namespace coach_in
 					c->frequency = p.frequency;
 					c->pulse = p.pulse;
 					c->duration = p.duration;
+
+					return true;
+				}
+
+				return false;
+			}
+
+			bool drive(DrivePacket p)
+			{
+				if (p.channel_identifier < this->channels().size()) {
+					auto c = this->channelForIndex(p.channel_identifier);
+					if (p.delay_ms > 0) {
+						delayMicroseconds(p.delay_ms);
+					}
+					c->drive();
+					delayMicroseconds((1000000 / c->frequency) - (MultiEMS::Channel::Delay * _channels.size()));
+
 					return true;
 				}
 
