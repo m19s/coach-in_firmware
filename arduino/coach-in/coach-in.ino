@@ -41,12 +41,12 @@ void loop()
 	else {
 		DevKit2::UpdateType type = board->update();
 		switch (type) {
-			case None:
+			case DevKit2::UpdateType::None:
 				break;
-			case Drive:
+			case DevKit2::UpdateType::Drive:
 				Serial.println("drive");
 				break;
-			case Channel:
+			case DevKit2::UpdateType::Channel:
 				Serial.println("channel");
 				break;
 		}

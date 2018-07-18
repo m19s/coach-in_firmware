@@ -114,8 +114,6 @@ namespace coach_in
 				Channel = 2
 			} UpdateType;
 
-			uint16_t last_packet_data = 0;
-
 			DevKit2()
 			    : rkmtlab::MultiEMS::Board(kNumberOfChannels)
 			{
@@ -171,13 +169,12 @@ namespace coach_in
 						}
 					}
 
-					this->last_packet_data = data;
 					this->spi_stack.flush();
 				}
 				return None;
 			}
 
-			bool update_channel(Packet p)
+			bool update_channel(ChannelPacket p)
 			{
 				if (p.channel_identifier < this->channels().size()) {
 					auto c = this->channelForIndex(p.channel_identifier);
@@ -199,7 +196,7 @@ namespace coach_in
 						delayMicroseconds(p.delay_ms);
 					}
 					c->drive();
-					delayMicroseconds((1000000 / c->frequency) - (MultiEMS::Channel::Delay * _channels.size()));
+					delayMicroseconds((1000000 / c->frequency) - (rkmtlab::MultiEMS::Channel::Delay * _channels.size()));
 
 					return true;
 				}
