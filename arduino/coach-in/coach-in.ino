@@ -47,10 +47,10 @@ void loop()
 			case DevKit2::UpdateType::None:
 				break;
 			case DevKit2::UpdateType::Drive:
-				// Serial.println("drive");
+				Serial.println("drive");
 				break;
 			case DevKit2::UpdateType::Channel:
-				// Serial.println("channel");
+				Serial.println("channel");
 				break;
 		}
 	}

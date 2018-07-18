@@ -15,13 +15,15 @@ namespace coach_in
 		class DrivePacket
 		{
 		public:
+			bool drive_all;
 			int channel_identifier;
 			int delay_ms;
 
 			DrivePacket(uint8_t data)
 			{
-				this->channel_identifier = ((data & 0b11100000) >> 5);
-				this->delay_ms = (data & 0b00011111) * 100;
+				this->drive_all = (data & 0b10000000) > 0;
+				this->channel_identifier = ((data & 0b01110000) >> 4);
+				this->delay_ms = (data & 0b00001111) * 100;
 			}
 		};
 
@@ -191,7 +193,13 @@ namespace coach_in
 
 			bool drive(DrivePacket p)
 			{
-				if (p.channel_identifier < this->channels().size()) {
+				if (p.drive_all) {
+					Serial.println("drive all");
+
+					this->driveAll();
+				}
+				else if (p.channel_identifier < this->channels().size()) {
+					Serial.println("drive");
 					auto c = this->channelForIndex(p.channel_identifier);
 					if (p.delay_ms > 0) {
 						delayMicroseconds(p.delay_ms);
