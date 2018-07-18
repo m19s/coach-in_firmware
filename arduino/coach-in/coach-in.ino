@@ -11,6 +11,9 @@ volatile uint8_t counter = 0;
 ISR(SPI_STC_vect)
 {
 	byte c = SPDR; // grab byte from SPI Data Register
+	Serial.print("receive: ");
+	Serial.println(c, BIN);
+
 	board->process_data(c);
 }
 
@@ -27,7 +30,7 @@ void loop()
 	board->discharge();
 
 	if (Serial.available() > 19) {
-		Serial.println("drive");
+		Serial.println("serial drive");
 		for (rkmtlab::MultiEMS::Channel *c : board->channels()) {
 			c->pulse = Serial.read();
 			c->frequency = Serial.read();
@@ -44,10 +47,10 @@ void loop()
 			case DevKit2::UpdateType::None:
 				break;
 			case DevKit2::UpdateType::Drive:
-				Serial.println("drive");
+				// Serial.println("drive");
 				break;
 			case DevKit2::UpdateType::Channel:
-				Serial.println("channel");
+				// Serial.println("channel");
 				break;
 		}
 	}

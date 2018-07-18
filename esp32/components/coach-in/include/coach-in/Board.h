@@ -5,11 +5,11 @@
 #include <functional>
 #include <sdkconfig.h>
 
-#include "./Configuration.h"
-#include "./Packet.h"
 #include <BLEDevice.h>
 #include <SPIWrapper.h>
 #include <StreamLogger/Logger.h>
+#include <coach-in/Configuration.h>
+#include <coach-in/Packet.h>
 
 using namespace m2d::ESP32;
 static Logger::Group logger("coach_in");
@@ -85,13 +85,7 @@ namespace coach_in
 				auto ems_drive_handler = new EMSDriveCharacteristicHandler();
 				ems_drive_handler->write_handler = [this](const char *data) {
 					m19s::coach_in::ESP32::DrivePacket packet((uint8_t)data[0]);
-					m2d::ESP32::SPITransaction t;
-					uint8_t type = packet.type();
-					t.set_tx_buffer(&type, 1);
-					assert(this->spi->transmit(t) == ESP_OK);
-					uint8_t packet_data = packet.to_8bits_data();
-					t.set_tx_buffer(&packet_data, 1);
-					assert(this->spi->transmit(t) == ESP_OK);
+					this->send_packet(&packet);
 				};
 				drive_characteristic->setCallbacks(ems_drive_handler);
 
@@ -104,6 +98,25 @@ namespace coach_in
 				ems_service->start();
 				device_status_service->start();
 				server->startAdvertising();
+			}
+
+			void send_packet(coach_in::ESP32::Packet *packet)
+			{
+				m2d::ESP32::SPITransaction t;
+				uint8_t type = packet->type();
+				t.set_tx_buffer(&type, 1);
+				assert(this->spi->transmit(t) == ESP_OK);
+
+				std::string pt = packet->type() == 0 ? "drive: " : "channel: ";
+				Logger::I << pt << std::bitset<8>(type).to_string() << ", ";
+				for (uint8_t d : packet->to_byte_vector()) {
+					t.set_tx_buffer(&d, 1);
+					assert(this->spi->transmit(t) == ESP_OK);
+					Logger::I << std::bitset<8>(d).to_string() << ", ";
+					vTaskDelay(10 / portTICK_PERIOD_MS);
+				}
+
+				Logger::I << Logger::endl;
 			}
 		};
 
@@ -143,14 +156,7 @@ namespace coach_in
 					packet_data |= (uint8_t)data[1];
 
 					m19s::coach_in::ESP32::ChannelPacket packet(packet_data);
-					m2d::ESP32::SPITransaction t;
-					uint8_t type = packet.type();
-					t.set_tx_buffer(&type, 1);
-					assert(this->spi->transmit(t) == ESP_OK);
-					for (uint8_t d : packet.to_byte_vector()) {
-						t.set_tx_buffer(&d, 1);
-						assert(this->spi->transmit(t) == ESP_OK);
-					}
+					this->send_packet(&packet);
 				};
 
 				ChannelPacket channel_packet(0, 0, 0, 0);
@@ -172,6 +178,7 @@ namespace coach_in
 				channel4_characteristic->setCallbacks(channel_handler);
 
 				BLECharacteristic *device_mode_characteristic = this->device_status_service->createCharacteristic(UUID::DeviceStatusServiceModeCharacteristicUUID.c_str(), BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_READ);
+
 				int mode = NormalMode;
 				device_mode_characteristic->setValue(mode);
 				device_mode_characteristic->setCallbacks(new DeviceModeCharacteristicHandler());

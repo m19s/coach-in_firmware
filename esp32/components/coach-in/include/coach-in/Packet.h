@@ -11,6 +11,12 @@ namespace coach_in
 		class Packet
 		{
 		public:
+			typedef enum
+			{
+				Drive,
+				Channel
+			} Type;
+
 			Packet() {}
 			Packet(uint8_t data){};
 			Packet(uint16_t data){};
@@ -26,29 +32,36 @@ namespace coach_in
 		public:
 			uint8_t _channel_identifier;
 			uint8_t _delay_ms;
+			bool drive_all;
 
-			DrivePacket(uint8_t identifier, uint8_t delay_ms)
+			DrivePacket(uint8_t identifier, uint8_t delay_ms, bool drive_all = false)
 			{
+				this->drive_all = drive_all;
 				this->_channel_identifier = identifier;
 				this->_delay_ms = delay_ms;
 			}
 
 			DrivePacket(uint8_t data)
 			{
-				this->_channel_identifier = data & 0b11100000;
-				this->_delay_ms = data & 0b00011111;
+				this->drive_all = data & 0b10000000;
+				this->_channel_identifier = data & 0b01110000;
+				this->_delay_ms = data & 0b00001111;
 			}
 
 			uint8_t type()
 			{
-				return 0;
+				return Packet::Type::Drive;
 			}
 
 			uint8_t to_8bits_data()
 			{
 				uint8_t data = 0;
-				data = this->_channel_identifier;
-				data <<= 5;
+				data = this->drive_all == true ? 0x01 : 0x00;
+
+				data <<= 3;
+				data |= this->_channel_identifier;
+
+				data <<= 4;
 				data |= this->_delay_ms;
 
 				return data;
@@ -57,6 +70,7 @@ namespace coach_in
 			uint16_t to_16bits_data()
 			{
 				uint16_t data = (uint16_t)this->to_8bits_data();
+				data <<= 8;
 				return data;
 			}
 
@@ -64,6 +78,7 @@ namespace coach_in
 			{
 				std::vector<uint8_t> v;
 				v.push_back(this->to_8bits_data());
+				v.push_back(0);
 
 				return v;
 			}
@@ -116,7 +131,7 @@ namespace coach_in
 
 			uint8_t type()
 			{
-				return 1;
+				return Packet::Type::Channel;
 			}
 
 			uint8_t channel_identifier()
@@ -150,20 +165,20 @@ namespace coach_in
 				uint16_t bytes = 0;
 				uint16_t identifier = this->_channel_identifier;
 				bytes |= identifier;
-				bytes <<= 5;
 
+				bytes <<= 5;
 				uint16_t pulse = this->_pulse;
 				pulse -= 40;
 				pulse /= 10;
 				bytes |= pulse;
-				bytes <<= 4;
 
+				bytes <<= 4;
 				uint16_t frequency = this->_frequency;
 				frequency -= 50;
 				frequency /= 10;
 				bytes |= frequency;
-				bytes <<= 4;
 
+				bytes <<= 4;
 				uint16_t duration = this->_duration;
 				duration -= 500;
 				duration /= 100;

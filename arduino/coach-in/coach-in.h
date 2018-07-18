@@ -145,16 +145,14 @@ namespace coach_in
 			UpdateType update()
 			{
 				if (this->spi_stack.available()) {
-					Serial.print("available: ");
-					Serial.print(this->spi_stack.buffer[0], BIN);
-					Serial.print(",");
-					Serial.print(this->spi_stack.buffer[1], BIN);
-					Serial.print(",");
-					Serial.println(this->spi_stack.buffer[3], BIN);
+					// Serial.print("available: ");
+					this->spi_stack.flush();
 
 					uint8_t type = this->spi_stack.buffer[0];
 					if (type == 0) {
 						// drive packet
+						// Serial.println(this->spi_stack.buffer[1], BIN);
+
 						uint16_t data = this->spi_stack.buffer[1];
 						if (this->drive(DrivePacket(data))) {
 							return Drive;
@@ -162,14 +160,17 @@ namespace coach_in
 					}
 					else if (type == 1) {
 						// channel packet
+						// Serial.print(this->spi_stack.buffer[1], BIN);
+						// Serial.print(",");
+						// Serial.println(this->spi_stack.buffer[2], BIN);
+
 						uint16_t data = this->spi_stack.buffer[1] << 8;
 						data |= this->spi_stack.buffer[2];
+
 						if (this->update_channel(ChannelPacket(data))) {
 							return Channel;
 						}
 					}
-
-					this->spi_stack.flush();
 				}
 				return None;
 			}
