@@ -1,5 +1,7 @@
 build
 sdkconfig
+.bundle
+vendor/
 
 # Created by https://www.gitignore.io/api/c++,ruby,kicad,swift,eagle,linux,xcode,macos,swiftpm,windows,fastlane,carthage,cocoapods,objective-c,visualstudiocode,swiftpackagemanager
 

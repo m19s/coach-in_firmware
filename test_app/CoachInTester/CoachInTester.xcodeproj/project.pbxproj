@@ -12,6 +12,7 @@
 		E921173D20FF14FE00B6E557 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E921173B20FF14FE00B6E557 /* Main.storyboard */; };
 		E921173F20FF14FF00B6E557 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E921173E20FF14FF00B6E557 /* Assets.xcassets */; };
 		E921174220FF14FF00B6E557 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E921174020FF14FF00B6E557 /* LaunchScreen.storyboard */; };
+		E921174A20FF164200B6E557 /* PeripheralTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921174920FF164200B6E557 /* PeripheralTableViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,7 @@
 		E921173E20FF14FF00B6E557 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E921174120FF14FF00B6E557 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E921174320FF14FF00B6E557 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E921174920FF164200B6E557 /* PeripheralTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeripheralTableViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +58,7 @@
 			children = (
 				E921173720FF14FE00B6E557 /* AppDelegate.swift */,
 				E921173920FF14FE00B6E557 /* ViewController.swift */,
+				E921174920FF164200B6E557 /* PeripheralTableViewController.swift */,
 				E921173B20FF14FE00B6E557 /* Main.storyboard */,
 				E921173E20FF14FF00B6E557 /* Assets.xcassets */,
 				E921174020FF14FF00B6E557 /* LaunchScreen.storyboard */,
@@ -135,6 +138,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E921174A20FF164200B6E557 /* PeripheralTableViewController.swift in Sources */,
 				E921173A20FF14FE00B6E557 /* ViewController.swift in Sources */,
 				E921173820FF14FE00B6E557 /* AppDelegate.swift in Sources */,
 			);
