@@ -12,6 +12,7 @@ import CoreBluetooth
 class PeripheralTableViewController: UITableViewController {
 
 	var centralManager: CBCentralManager!
+	var peripherals: NSMutableSet = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,16 +37,15 @@ class PeripheralTableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
+        return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 0
+        return peripherals.count
     }
 	
 	@objc func scan() {
+		peripherals = []
 		centralManager.scanForPeripherals(withServices: nil, options: nil)
 	}
 
@@ -114,5 +114,6 @@ extension PeripheralTableViewController: CBCentralManagerDelegate
 	
 	func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
 		print("peripheral: \(peripheral)")
+		peripherals.add(peripheral)
 	}
 }
