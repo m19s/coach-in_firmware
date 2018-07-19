@@ -11,8 +11,6 @@ volatile uint8_t counter = 0;
 ISR(SPI_STC_vect)
 {
 	byte c = SPDR; // grab byte from SPI Data Register
-	Serial.print("receive: ");
-	Serial.println(c, BIN);
 
 	board->process_data(c);
 }
@@ -48,6 +46,9 @@ void loop()
 				break;
 			case DevKit2::UpdateType::Drive:
 				Serial.println("drive");
+				break;
+			case DevKit2::UpdateType::DriveAll:
+				Serial.println("drive all");
 				break;
 			case DevKit2::UpdateType::Channel:
 				Serial.println("channel");

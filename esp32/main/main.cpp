@@ -24,18 +24,4 @@ void app_main()
 
 	gpio_set_direction(GPIO_NUM_5, GPIO_MODE_OUTPUT);
 	gpio_set_level(GPIO_NUM_5, 0);
-
-	while (1) {
-		auto drive_packet = DrivePacket(1, 1);
-		devkit.send_packet(&drive_packet);
-		vTaskDelay(5000 / portTICK_PERIOD_MS);
-
-		auto drive_packet2 = DrivePacket(1, 1, true);
-		devkit.send_packet(&drive_packet2);
-		vTaskDelay(5000 / portTICK_PERIOD_MS);
-
-		auto channel_packet = ChannelPacket(1, 80, 50, 1500);
-		devkit.send_packet(&channel_packet);
-		vTaskDelay(5000 / portTICK_PERIOD_MS);
-	}
 }

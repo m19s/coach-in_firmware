@@ -1,6 +1,5 @@
 #pragma once
 
-#include <bitset>
 #include <cstdlib>
 #include <functional>
 #include <sdkconfig.h>
@@ -10,6 +9,8 @@
 #include <StreamLogger/Logger.h>
 #include <coach-in/Configuration.h>
 #include <coach-in/Packet.h>
+
+#include <bitset>
 
 using namespace m2d::ESP32;
 static Logger::Group logger("coach_in");
@@ -62,7 +63,7 @@ namespace coach_in
 
 			Board(std::string name)
 			{
-				this->spi = new SPIWrapper(4000000, 3, (gpio_num_t)GPIO_NUM_18, (gpio_num_t)GPIO_NUM_23, (gpio_num_t)GPIO_NUM_19, (gpio_num_t)GPIO_NUM_5, VSPI_HOST, (SPI_DEVICE_TXBIT_LSBFIRST | SPI_DEVICE_TXBIT_LSBFIRST | SPI_DEVICE_NO_DUMMY));
+				this->spi = new SPIWrapper(1000000, 3, (gpio_num_t)GPIO_NUM_18, (gpio_num_t)GPIO_NUM_23, (gpio_num_t)GPIO_NUM_19, (gpio_num_t)GPIO_NUM_5, VSPI_HOST, (SPI_DEVICE_TXBIT_LSBFIRST | SPI_DEVICE_RXBIT_LSBFIRST | SPI_DEVICE_NO_DUMMY));
 
 				BLEDevice::init(name);
 				this->server = BLEDevice::createServer();
@@ -107,13 +108,11 @@ namespace coach_in
 				t.set_tx_buffer(&type, 1);
 				assert(this->spi->transmit(t) == ESP_OK);
 
-				std::string pt = packet->type() == 0 ? "drive: " : "channel: ";
-				Logger::I << pt << std::bitset<8>(type).to_string() << ", ";
 				for (uint8_t d : packet->to_byte_vector()) {
 					t.set_tx_buffer(&d, 1);
 					assert(this->spi->transmit(t) == ESP_OK);
 					Logger::I << std::bitset<8>(d).to_string() << ", ";
-					vTaskDelay(10 / portTICK_PERIOD_MS);
+					vTaskDelay(20 / portTICK_PERIOD_MS);
 				}
 
 				Logger::I << Logger::endl;

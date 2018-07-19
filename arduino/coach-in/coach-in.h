@@ -37,14 +37,6 @@ namespace coach_in
 
 			ChannelPacket(uint16_t data)
 			{
-				// 合計2byte。下記データはMSBから順番に並んでる。
-				// | param     | size | note             |
-				// |-----------|------|------------------|
-				// | channel   | 3bit |                  |
-				// | pulse     | 5bit | 40~240, 10刻み    |
-				// | frequency | 4bit | 50~150, 10刻み    |
-				// | duration  | 4bit | 500~2000, 100刻み |
-
 				this->duration = data & 0b00001111;
 				this->duration *= 100;
 				this->duration += 500;
@@ -107,18 +99,22 @@ namespace coach_in
 			Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40);
 			m2d::Arduino::SPI::Stack spi_stack = m2d::Arduino::SPI::Stack(3);
 			static const int kNumberOfChannels = 4;
+			SoftwareSerial *soft_serial;
 
 		public:
 			typedef enum
 			{
 				None = 0,
 				Drive = 1,
-				Channel = 2
+				DriveAll = 2,
+				Channel = 3
 			} UpdateType;
 
 			DevKit2()
 			    : rkmtlab::MultiEMS::Board(kNumberOfChannels)
 			{
+				spi_stack.setup(m2d::Arduino::SPI::Stack::Mode3, m2d::Arduino::SPI::Stack::LSBFirst, SPI_CLOCK_DIV8);
+
 				pwm.begin();
 				// Supported only 33~720Hz
 				pwm.setPWMFreq(350);
@@ -126,7 +122,6 @@ namespace coach_in
 				for (int i = 0; i < 4; i++) {
 					pwm.setPWM(i, 0, 4096 / 2.0);
 				}
-				spi_stack.setup(m2d::Arduino::SPI::Stack::Mode3, m2d::Arduino::SPI::Stack::LSBFirst);
 			}
 
 			bool set_pwm_frequency(int frequency)
@@ -147,34 +142,42 @@ namespace coach_in
 			UpdateType update()
 			{
 				if (this->spi_stack.available()) {
-					// Serial.print("available: ");
-					this->spi_stack.flush();
-
 					uint8_t type = this->spi_stack.buffer[0];
+					// Serial.print(this->spi_stack.buffer[1], BIN);
+					// Serial.print(",");
+					// Serial.println(this->spi_stack.buffer[2], BIN);
 					if (type == 0) {
 						// drive packet
-						// Serial.println(this->spi_stack.buffer[1], BIN);
-
 						uint16_t data = this->spi_stack.buffer[1];
-						if (this->drive(DrivePacket(data))) {
-							return Drive;
+						this->stack_flush();
+
+						auto packet = DrivePacket(data);
+						if (this->drive(packet)) {
+							if (packet.drive_all) {
+								return DriveAll;
+							}
+							else {
+								return Drive;
+							}
 						}
 					}
 					else if (type == 1) {
 						// channel packet
-						// Serial.print(this->spi_stack.buffer[1], BIN);
-						// Serial.print(",");
-						// Serial.println(this->spi_stack.buffer[2], BIN);
-
 						uint16_t data = this->spi_stack.buffer[1] << 8;
 						data |= this->spi_stack.buffer[2];
 
+						this->stack_flush();
 						if (this->update_channel(ChannelPacket(data))) {
 							return Channel;
 						}
 					}
 				}
 				return None;
+			}
+
+			void stack_flush()
+			{
+				this->spi_stack.flush();
 			}
 
 			bool update_channel(ChannelPacket p)
@@ -194,12 +197,9 @@ namespace coach_in
 			bool drive(DrivePacket p)
 			{
 				if (p.drive_all) {
-					Serial.println("drive all");
-
 					this->driveAll();
 				}
 				else if (p.channel_identifier < this->channels().size()) {
-					Serial.println("drive");
 					auto c = this->channelForIndex(p.channel_identifier);
 					if (p.delay_ms > 0) {
 						delayMicroseconds(p.delay_ms);
