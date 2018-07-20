@@ -2,6 +2,8 @@
 ## Arduino
 ### Dependencies
 - [Arduino_SPI-Stack](https://github.com/0x0c/Arduino_SPI-Stack)
+- [Adafruit-PWM-Servo-Driver-Library](https://github.com/adafruit/Adafruit-PWM-Servo-Driver-Library)
+- [multi-ems](https://github.com/rkmtlab/multi-ems)
 
 ## ESP32
 ### Dependencies
