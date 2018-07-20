@@ -99,7 +99,6 @@ namespace coach_in
 			Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40);
 			m2d::Arduino::SPI::Stack spi_stack = m2d::Arduino::SPI::Stack(3);
 			static const int kNumberOfChannels = 4;
-			SoftwareSerial *soft_serial;
 
 		public:
 			typedef enum
