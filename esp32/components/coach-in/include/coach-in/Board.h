@@ -98,6 +98,12 @@ namespace coach_in
 				device_info_service->start();
 				ems_service->start();
 				device_status_service->start();
+
+				BLEAdvertising *advertising = this->server->getAdvertising();
+				BLEAdvertisementData advertising_data;
+				advertising_data.setCompleteServices(BLEUUID(UUID::DeviceInfoServiceUUID));
+				advertising_data.setManufacturerData(Configuration::FirmareVersion);
+				advertising->setAdvertisementData(advertising_data);
 				server->startAdvertising();
 			}
 
@@ -145,7 +151,7 @@ namespace coach_in
 
 		public:
 			DevKit2(std::string name)
-			    : Board("DevKit2 - " + name)
+			    : Board(Configuration::DeviceName + name)
 			{
 				auto channel_handler = new ChannelCharacteristicHandler();
 				channel_handler->write_handler = [this](const char *data) {

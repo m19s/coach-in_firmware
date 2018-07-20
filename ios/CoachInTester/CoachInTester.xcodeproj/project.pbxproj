@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		B7062CFBFBE9C4A2C5ED726E /* Pods_CoachInTester.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 863BB727E3FD7C6908625D80 /* Pods_CoachInTester.framework */; };
+		E913820F2101315D0018DA02 /* UUID.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913820E2101315D0018DA02 /* UUID.swift */; };
+		E91382112101390C0018DA02 /* OperationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91382102101390C0018DA02 /* OperationViewController.swift */; };
+		E913821321013AFE0018DA02 /* ChannelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913821221013AFE0018DA02 /* ChannelViewController.swift */; };
 		E921173820FF14FE00B6E557 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921173720FF14FE00B6E557 /* AppDelegate.swift */; };
 		E921173A20FF14FE00B6E557 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921173920FF14FE00B6E557 /* ViewController.swift */; };
 		E921173D20FF14FE00B6E557 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E921173B20FF14FE00B6E557 /* Main.storyboard */; };
@@ -20,6 +23,9 @@
 		863BB727E3FD7C6908625D80 /* Pods_CoachInTester.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CoachInTester.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9CA7E9C0507E808322870A1E /* Pods-CoachInTester.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CoachInTester.release.xcconfig"; path = "Pods/Target Support Files/Pods-CoachInTester/Pods-CoachInTester.release.xcconfig"; sourceTree = "<group>"; };
 		ADEFC36E1815E7A36075EDE9 /* Pods-CoachInTester.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CoachInTester.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CoachInTester/Pods-CoachInTester.debug.xcconfig"; sourceTree = "<group>"; };
+		E913820E2101315D0018DA02 /* UUID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UUID.swift; sourceTree = "<group>"; };
+		E91382102101390C0018DA02 /* OperationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationViewController.swift; sourceTree = "<group>"; };
+		E913821221013AFE0018DA02 /* ChannelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelViewController.swift; sourceTree = "<group>"; };
 		E921173420FF14FE00B6E557 /* CoachInTester.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CoachInTester.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E921173720FF14FE00B6E557 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E921173920FF14FE00B6E557 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -81,8 +87,11 @@
 			isa = PBXGroup;
 			children = (
 				E921173720FF14FE00B6E557 /* AppDelegate.swift */,
+				E913820E2101315D0018DA02 /* UUID.swift */,
 				E921173920FF14FE00B6E557 /* ViewController.swift */,
 				E921174920FF164200B6E557 /* PeripheralTableViewController.swift */,
+				E91382102101390C0018DA02 /* OperationViewController.swift */,
+				E913821221013AFE0018DA02 /* ChannelViewController.swift */,
 				E921173B20FF14FE00B6E557 /* Main.storyboard */,
 				E921173E20FF14FF00B6E557 /* Assets.xcassets */,
 				E921174020FF14FF00B6E557 /* LaunchScreen.storyboard */,
@@ -203,8 +212,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E913820F2101315D0018DA02 /* UUID.swift in Sources */,
+				E91382112101390C0018DA02 /* OperationViewController.swift in Sources */,
 				E921174A20FF164200B6E557 /* PeripheralTableViewController.swift in Sources */,
 				E921173A20FF14FE00B6E557 /* ViewController.swift in Sources */,
+				E913821321013AFE0018DA02 /* ChannelViewController.swift in Sources */,
 				E921173820FF14FE00B6E557 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
