@@ -65,7 +65,7 @@ namespace coach_in
 
 				this->device_info_service = server->createService(UUID::DeviceInfoServiceUUID.c_str());
 				BLECharacteristic *device_name_characteristic = device_info_service->createCharacteristic(UUID::DeviceInfoServiceDeviceNameCharacteristicUUID.c_str(), BLECharacteristic::PROPERTY_READ);
-				device_name_characteristic->setValue(Configuration::DeviceName);
+				device_name_characteristic->setValue(name);
 				BLECharacteristic *device_version_characteristic = device_info_service->createCharacteristic(UUID::DeviceInfoServiceDeviceVersionCharacteristicUUID.c_str(), BLECharacteristic::PROPERTY_READ);
 				device_version_characteristic->setValue(Configuration::DeviceVerson);
 				BLECharacteristic *device_firmware_version_characteristic = device_info_service->createCharacteristic(UUID::DeviceInfoServiceDeviceFirmwareVersionCharacteristicUUID.c_str(), BLECharacteristic::PROPERTY_READ);
@@ -129,10 +129,6 @@ namespace coach_in
 			{
 				void onWrite(BLECharacteristic *c)
 				{
-					const char *data = c->getValue().c_str();
-					char *pHex = BLEUtils::buildHexData(nullptr, (uint8_t *)data, 1);
-					logger.debug << pHex << Logger::endl;
-					logger.debug << (uint8_t)data[0] << Logger::endl;
 					this->write_handler(c->getValue().c_str());
 				}
 			};
