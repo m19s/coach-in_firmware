@@ -9,7 +9,6 @@
 #include <StreamLogger/Logger.h>
 #include <coach-in/Configuration.h>
 #include <coach-in/Packet.h>
-#include <parallel_lines.h>
 
 #include <bitset>
 
@@ -81,14 +80,11 @@ namespace coach_in
 
 				auto ems_drive_handler = new EMSDriveCharacteristicHandler();
 				ems_drive_handler->write_handler = [this](const char *data) {
-					parallel_lines::scheduler *s = parallel_lines::scheduler::shared_scheduler();
-					s->push([this, data] {
-						m19s::coach_in::ESP32::DrivePacket packet((uint8_t)data[0]);
-						this->send_packet(&packet);
-					});
+					m19s::coach_in::ESP32::DrivePacket packet((uint8_t)data[0]);
+					this->send_packet(&packet);
 				};
 				drive_characteristic->setCallbacks(ems_drive_handler);
-				gt this->device_status_service = server->createService(UUID::DeviceStatusServiceUUID.c_str());
+				this->device_status_service = server->createService(UUID::DeviceStatusServiceUUID.c_str());
 			}
 
 			void run()
@@ -103,15 +99,6 @@ namespace coach_in
 				advertising_data.setManufacturerData(Configuration::FirmareVersion);
 				advertising->setAdvertisementData(advertising_data);
 				server->startAdvertising();
-
-				static m2d::FreeRTOS::Task task("packet task", 10, 1024 * 5, [&] {
-					parallel_lines::scheduler *s = parallel_lines::scheduler::shared_scheduler();
-					while (1) {
-						s->update();
-						vTaskDelay(25 / portTICK_PERIOD_MS);
-					}
-				});
-				task.run();
 			}
 
 			void send_packet(coach_in::ESP32::Packet *packet)
@@ -142,6 +129,10 @@ namespace coach_in
 			{
 				void onWrite(BLECharacteristic *c)
 				{
+					const char *data = c->getValue().c_str();
+					char *pHex = BLEUtils::buildHexData(nullptr, (uint8_t *)data, 1);
+					logger.debug << pHex << Logger::endl;
+					logger.debug << (uint8_t)data[0] << Logger::endl;
 					this->write_handler(c->getValue().c_str());
 				}
 			};
@@ -155,22 +146,18 @@ namespace coach_in
 			};
 
 		public:
-			bool go = false;
 			DevKit2(std::string name)
 			    : Board(Configuration::DeviceName + name)
 			{
 				auto channel_handler = new ChannelCharacteristicHandler();
 				channel_handler->write_handler = [this](const char *data) {
-					parallel_lines::scheduler *s = parallel_lines::scheduler::shared_scheduler();
-					s->push([this, data] {
-						uint16_t packet_data = 0;
-						packet_data = (uint8_t)data[0];
-						packet_data <<= 8;
-						packet_data |= (uint8_t)data[1];
+					uint16_t packet_data = 0;
+					packet_data = (uint8_t)data[0];
+					packet_data <<= 8;
+					packet_data |= (uint8_t)data[1];
 
-						m19s::coach_in::ESP32::ChannelPacket packet(packet_data);
-						this->send_packet(&packet);
-					});
+					m19s::coach_in::ESP32::ChannelPacket packet(packet_data);
+					this->send_packet(&packet);
 				};
 
 				ChannelPacket channel_packet(0, 0, 0, 0);
