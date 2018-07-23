@@ -142,9 +142,6 @@ namespace coach_in
 			{
 				if (this->spi_stack.available()) {
 					uint8_t type = this->spi_stack.buffer[0];
-					// Serial.print(this->spi_stack.buffer[1], BIN);
-					// Serial.print(",");
-					// Serial.println(this->spi_stack.buffer[2], BIN);
 					if (type == 0) {
 						// drive packet
 						uint16_t data = this->spi_stack.buffer[1];
@@ -197,6 +194,7 @@ namespace coach_in
 			{
 				if (p.drive_all) {
 					this->driveAll();
+					return true;
 				}
 				else if (p.channel_identifier < this->channels().size()) {
 					auto c = this->channelForIndex(p.channel_identifier);

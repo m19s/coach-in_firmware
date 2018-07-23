@@ -13,6 +13,7 @@ ISR(SPI_STC_vect)
 	byte c = SPDR; // grab byte from SPI Data Register
 
 	board->process_data(c);
+	Serial.println(c, BIN);
 }
 
 void setup()
