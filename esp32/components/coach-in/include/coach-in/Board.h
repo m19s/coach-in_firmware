@@ -4,9 +4,11 @@
 #include <functional>
 #include <sdkconfig.h>
 
+#include <StreamLogger/Logger.h>
+#include <WS2812-Utility/LED.h>
+
 #include <BLEDevice.h>
 #include <SPIWrapper.h>
-#include <StreamLogger/Logger.h>
 #include <coach-in/Configuration.h>
 #include <coach-in/Packet.h>
 
@@ -35,6 +37,8 @@ namespace coach_in
 		protected:
 			SPIWrapper *spi;
 
+			m2d::ESP32::LED::Strip *led_strip;
+
 			BLEServer *server;
 			BLEService *device_info_service;
 			BLEService *device_status_service;
@@ -59,6 +63,8 @@ namespace coach_in
 			Board(std::string name)
 			{
 				this->spi = new SPIWrapper(1000000, 3, (gpio_num_t)GPIO_NUM_18, (gpio_num_t)GPIO_NUM_23, (gpio_num_t)GPIO_NUM_19, (gpio_num_t)GPIO_NUM_5, VSPI_HOST, (SPI_DEVICE_TXBIT_LSBFIRST | SPI_DEVICE_RXBIT_LSBFIRST | SPI_DEVICE_NO_DUMMY));
+
+				this->led_strip = new LED::Strip(GPIO_NUM_17, Configuration::LEDStripLength, RMT_CHANNEL_1);
 
 				BLEDevice::init(name);
 				this->server = BLEDevice::createServer();

@@ -7,3 +7,6 @@
 [submodule "esp32/components/FreeRTOS-cpp_task"]
 	path = esp32/components/FreeRTOS-cpp_task
 	url = git@github.com:0x0c/FreeRTOS-cpp_task.git
+[submodule "esp32/components/WS2812-Utility"]
+	path = esp32/components/WS2812-Utility
+	url = git@github.com:0x0c/WS2812-Utility.git
