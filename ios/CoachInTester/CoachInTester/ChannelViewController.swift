@@ -12,11 +12,15 @@ import CoreBluetooth
 class ChannelViewController: UIViewController {
 
     var peripheral: CBPeripheral?
+    var channelIdentifier: UInt8 = 0
     var characteristicUUID: CBUUID?
     
     @IBOutlet weak var durationLabel: UILabel!
     @IBOutlet weak var frequencyLabel: UILabel!
     @IBOutlet weak var pulseLabel: UILabel!
+    @IBOutlet weak var durationStepper: UIStepper!
+    @IBOutlet weak var frequencyStepper: UIStepper!
+    @IBOutlet weak var pulseStepper: UIStepper!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,8 +30,8 @@ class ChannelViewController: UIViewController {
     
     @IBAction func sendChannelSettings(_ sender: Any) {
         if let p = peripheral, let uuid = characteristicUUID, let characteristic = p.characteristic(by: uuid) {
-            let data = Data(bytes: [1, 1])
-            p.writeValue(data, for: characteristic, type: .withResponse)
+            let packet = ChannelPacket(channel: channelIdentifier, pulse: UInt(pulseStepper.value), frequency: UInt(frequencyStepper.value), duration: UInt(durationStepper.value))
+            p.writeValue(Data(bytes: packet.byteArray()), for: characteristic, type: .withResponse)
         }
     }
 

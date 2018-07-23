@@ -78,6 +78,7 @@ class OperationViewController: UITableViewController, CBPeripheralDelegate {
 				Row(title: "Firmware version", value: nil, uuid: CBUUID(string: DeviceInfoServiceDeviceFirmwareVersionCharacteristicUUID)),
 				], uuid: CBUUID(string: DeviceInfoServiceUUID)),
 			Section(title: OperationViewController.EMSServiceSection, rows: [
+                Row(title: "Drive", value: nil, uuid: CBUUID(string: EMSServiceDriveCharacteristicUUID)),
 				Row(title: "Channel 1", value: nil, uuid: CBUUID(string: EMSServiceChannel1CharacteristicUUID)),
 				Row(title: "Channel 2", value: nil, uuid: CBUUID(string: EMSServiceChannel2CharacteristicUUID)),
 				Row(title: "Channel 3", value: nil, uuid: CBUUID(string: EMSServiceChannel3CharacteristicUUID)),
@@ -202,10 +203,19 @@ class OperationViewController: UITableViewController, CBPeripheralDelegate {
         switch section.title {
         case OperationViewController.EMSServiceSection: do {
             let row = section.rows[indexPath.row]
-            let viewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ChannelViewController") as! ChannelViewController
-            viewController.peripheral = peripheral
-            viewController.characteristicUUID = row.uuid
-            navigationController?.pushViewController(viewController, animated: true)
+            if row.title == "Drive" {
+                if let p = peripheral, let characteristic = p.characteristic(by: row.uuid) {
+                    let packet = DrivePacket(channel: 0, delayMilliSeconds: 0, driveAll: true)
+                    p.writeValue(Data(bytes: packet.byteArray()), for: characteristic, type: .withResponse)
+                }
+            }
+            else {
+                let viewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ChannelViewController") as! ChannelViewController
+                viewController.channelIdentifier = UInt8(indexPath.row - 1)
+                viewController.peripheral = peripheral
+                viewController.characteristicUUID = row.uuid
+                navigationController?.pushViewController(viewController, animated: true)
+            }
         }
             break
         default:

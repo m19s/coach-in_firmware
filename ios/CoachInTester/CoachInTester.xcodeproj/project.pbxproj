@@ -18,6 +18,7 @@
 		E921174220FF14FF00B6E557 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E921174020FF14FF00B6E557 /* LaunchScreen.storyboard */; };
 		E921174A20FF164200B6E557 /* PeripheralTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921174920FF164200B6E557 /* PeripheralTableViewController.swift */; };
 		E9A97B4B2104D84100A447A6 /* BLEConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A97B4A2104D84100A447A6 /* BLEConnectionManager.swift */; };
+		E9A97B4D21058D3300A447A6 /* Packet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A97B4C21058D3300A447A6 /* Packet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		E921174320FF14FF00B6E557 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E921174920FF164200B6E557 /* PeripheralTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeripheralTableViewController.swift; sourceTree = "<group>"; };
 		E9A97B4A2104D84100A447A6 /* BLEConnectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEConnectionManager.swift; sourceTree = "<group>"; };
+		E9A97B4C21058D3300A447A6 /* Packet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Packet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +93,7 @@
 				E921173720FF14FE00B6E557 /* AppDelegate.swift */,
 				E913820E2101315D0018DA02 /* UUID.swift */,
 				E921173920FF14FE00B6E557 /* ViewController.swift */,
+				E9A97B4C21058D3300A447A6 /* Packet.swift */,
 				E9A97B4A2104D84100A447A6 /* BLEConnectionManager.swift */,
 				E921174920FF164200B6E557 /* PeripheralTableViewController.swift */,
 				E91382102101390C0018DA02 /* OperationViewController.swift */,
@@ -222,6 +225,7 @@
 				E921173A20FF14FE00B6E557 /* ViewController.swift in Sources */,
 				E913821321013AFE0018DA02 /* ChannelViewController.swift in Sources */,
 				E921173820FF14FE00B6E557 /* AppDelegate.swift in Sources */,
+				E9A97B4D21058D3300A447A6 /* Packet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

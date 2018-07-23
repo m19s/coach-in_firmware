@@ -187,8 +187,11 @@
                     <navigationItem key="navigationItem" title="Channel1" id="eTm-U8-KSr"/>
                     <connections>
                         <outlet property="durationLabel" destination="3yI-3S-S0g" id="vws-ND-rtT"/>
+                        <outlet property="durationStepper" destination="cyw-uu-43E" id="ewm-bw-Tpn"/>
                         <outlet property="frequencyLabel" destination="KHr-6X-dzm" id="QLx-GB-FHZ"/>
+                        <outlet property="frequencyStepper" destination="ktJ-ei-Qof" id="ITy-bz-X28"/>
                         <outlet property="pulseLabel" destination="OTF-No-JaE" id="rMO-oP-AxC"/>
+                        <outlet property="pulseStepper" destination="dFG-Si-5YW" id="6wi-2b-Ykc"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dYW-YI-9rA" userLabel="First Responder" sceneMemberID="firstResponder"/>
