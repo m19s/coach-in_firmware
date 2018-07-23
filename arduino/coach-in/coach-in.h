@@ -63,8 +63,8 @@ namespace coach_in
 				bytes <<= 3;
 
 				int pulse = this->pulse;
-				this->pulse -= 40;
-				this->pulse /= 10;
+				pulse -= 40;
+				pulse /= 10;
 				bytes |= pulse;
 				bytes <<= 5;
 

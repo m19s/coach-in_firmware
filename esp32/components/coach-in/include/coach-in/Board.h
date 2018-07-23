@@ -46,11 +46,6 @@ namespace coach_in
 			public:
 				void onWrite(BLECharacteristic *c)
 				{
-					const char *data = c->getValue().c_str();
-					char *pHex = BLEUtils::buildHexData(nullptr, (uint8_t *)data, 1);
-					logger.debug << pHex << Logger::endl;
-					logger.debug << (uint8_t)data[0] << Logger::endl;
-
 					this->write_handler(c->getValue().c_str());
 				}
 			};
@@ -85,13 +80,15 @@ namespace coach_in
 				drive_characteristic->setValue(&d, 1);
 
 				auto ems_drive_handler = new EMSDriveCharacteristicHandler();
-				ems_drive_handler->write_handler = [&](const char *data) {
-					m19s::coach_in::ESP32::DrivePacket packet((uint8_t)data[0]);
-					this->send_packet(&packet);
+				ems_drive_handler->write_handler = [this](const char *data) {
+					parallel_lines::scheduler *s = parallel_lines::scheduler::shared_scheduler();
+					s->push([this, data] {
+						m19s::coach_in::ESP32::DrivePacket packet((uint8_t)data[0]);
+						this->send_packet(&packet);
+					});
 				};
 				drive_characteristic->setCallbacks(ems_drive_handler);
-
-				this->device_status_service = server->createService(UUID::DeviceStatusServiceUUID.c_str());
+				gt this->device_status_service = server->createService(UUID::DeviceStatusServiceUUID.c_str());
 			}
 
 			void run()
@@ -145,11 +142,6 @@ namespace coach_in
 			{
 				void onWrite(BLECharacteristic *c)
 				{
-					const char *data = c->getValue().c_str();
-					char *pHex = BLEUtils::buildHexData(nullptr, (uint8_t *)data, 1);
-					logger.debug << pHex << Logger::endl;
-					logger.debug << (uint8_t)data[0] << Logger::endl;
-
 					this->write_handler(c->getValue().c_str());
 				}
 			};
@@ -170,7 +162,6 @@ namespace coach_in
 				auto channel_handler = new ChannelCharacteristicHandler();
 				channel_handler->write_handler = [this](const char *data) {
 					parallel_lines::scheduler *s = parallel_lines::scheduler::shared_scheduler();
-
 					s->push([this, data] {
 						uint16_t packet_data = 0;
 						packet_data = (uint8_t)data[0];
