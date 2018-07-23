@@ -187,6 +187,14 @@ extension BLEConnectionManager: CBCentralManagerDelegate
         }
     }
     
+    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        for o in observers {
+            if let handler = o.onDisconnect {
+                handler(peripheral)
+            }
+        }
+    }
+    
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
         for o in observers {
             if let handler = o.onFailToConnect {

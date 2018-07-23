@@ -30,6 +30,7 @@ class PeripheralTableViewController: UITableViewController {
                         weakSelf.tableView.reloadData()
                         if let h = weakSelf.hud {
                             h.dismiss()
+                            weakSelf.tableView.refreshControl?.endRefreshing()
                         }
                     }
                 }
@@ -57,6 +58,14 @@ class PeripheralTableViewController: UITableViewController {
 		navigationItem.rightBarButtonItem = scanButton
 		
 		tableView.register(UITableViewCell.self, forCellReuseIdentifier: "reuseIdentifier")
+        
+        tableView.refreshControl = UIRefreshControl()
+        tableView.refreshControl?.addTarget(self, action: #selector(scan), for: .valueChanged)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        scan()
     }
     
     // MARK: - Table view data source
@@ -81,6 +90,7 @@ class PeripheralTableViewController: UITableViewController {
             if let h = self.hud {
                 h.dismiss()
                 self.tableView.reloadData()
+                self.tableView.refreshControl?.endRefreshing()
             }
         }
 	}
@@ -98,6 +108,7 @@ class PeripheralTableViewController: UITableViewController {
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		let peripheral = peripherals.allObjects[indexPath.row] as! CBPeripheral
         let viewController = OperationViewController(peripheral)
+        viewController.title = peripheral.name
         navigationController?.pushViewController(viewController, animated: true)
 	}
 }

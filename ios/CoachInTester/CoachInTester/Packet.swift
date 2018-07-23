@@ -66,7 +66,7 @@ class ChannelPacket: Packet {
         f /= 10
         secondByte |= (UInt8(f) & 0b00001111)
         
-        firstByte <<= 4
+        secondByte <<= 4
         var d = duration
         d -= 500
         d /= 100
