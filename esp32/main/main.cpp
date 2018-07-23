@@ -18,7 +18,7 @@ void app_main()
 {
 	static Logger::Group logger("coach_in");
 
-	DevKit2 devkit(std::string(CONFIG_COACH_IN_DEVICE_NAME));
+	static DevKit2 devkit(std::string(CONFIG_COACH_IN_DEVICE_NAME));
 	devkit.run();
 	logger.debug << "coach-in start" << Logger::endl;
 
