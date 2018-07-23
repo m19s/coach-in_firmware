@@ -9,7 +9,6 @@
 import Foundation
 
 let DeviceInfoServiceUUID : String = "6f876815-73fa-49eb-9e5f-052c2b448430";
-
 let DeviceInfoServiceDeviceNameCharacteristicUUID : String = "6f876815-73fa-49eb-9e5f-052c2b448431";
 let DeviceInfoServiceDeviceVersionCharacteristicUUID : String = "6f876815-73fa-49eb-9e5f-052c2b448432";
 let DeviceInfoServiceDeviceFirmwareVersionCharacteristicUUID : String = "6f876815-73fa-49eb-9e5f-052c2b448433";

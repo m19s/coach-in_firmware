@@ -12,6 +12,7 @@ import JGProgressHUD
 
 class PeripheralTableViewController: UITableViewController {
 
+    var observer = BLEConnectionObserver()
 	var hud : JGProgressHUD?
 	var centralManager: CBCentralManager!
 	var peripherals: NSMutableSet = []
@@ -19,14 +20,45 @@ class PeripheralTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		
-		centralManager = CBCentralManager(delegate: self, queue: nil)
-
+        observer.onDiscovered = { [weak self] (peripheral, advertisementData, rssi) in
+            print(advertisementData)
+            guard let weakSelf = self else { return }
+            if let uuids = advertisementData[CBAdvertisementDataServiceUUIDsKey] as? Array<CBUUID> {
+                for uuid in uuids {
+                    if uuid.uuidString == CBUUID(string: DeviceInfoServiceUUID).uuidString {
+                        weakSelf.peripherals.add(peripheral)
+                        weakSelf.tableView.reloadData()
+                        if let h = weakSelf.hud {
+                            h.dismiss()
+                        }
+                    }
+                }
+            }
+        }
+        
+        observer.onFailToConnect = { [weak self] (peripheral) in
+            guard let weakSelf = self else { return }
+            if let h = weakSelf.hud {
+                h.indicatorView = JGProgressHUDErrorIndicatorView()
+                h.textLabel.text = "Connect failed"
+                h.dismiss(afterDelay: 2)
+            }
+        }
+        
+        observer.onDisconnect = { [weak self] (peripheral) in
+            guard let weakSelf = self else { return }
+            weakSelf.navigationController?.popToRootViewController(animated: true)
+        }
+        
+        let manager = BLEConnectionManager.shared
+        manager.observers.append(observer)
+        
 		let scanButton = UIBarButtonItem(title: "Scan", style: .plain, target: self, action: #selector(scan));
 		navigationItem.rightBarButtonItem = scanButton
 		
 		tableView.register(UITableViewCell.self, forCellReuseIdentifier: "reuseIdentifier")
     }
-
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -39,16 +71,18 @@ class PeripheralTableViewController: UITableViewController {
 	
 	@objc func scan() {
 		peripherals = []
-		centralManager.scanForPeripherals(withServices: nil, options: nil)
-		
-		hud = JGProgressHUD()
-		hud!.textLabel.text = "Scanning..."
-		hud!.show(in: UIApplication.shared.delegate!.window!!)
-		hud!.dismiss(afterDelay: 5)
-		DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-			self.tableView.reloadData()
-			self.centralManager.stopScan()
-		}
+        
+        hud = JGProgressHUD()
+        hud!.textLabel.text = "Scanning..."
+        hud!.show(in: UIApplication.shared.delegate!.window!!)
+        
+        let manager = BLEConnectionManager.shared
+        manager.scan(withServices: [CBUUID(string: DeviceInfoServiceUUID)], options: nil, stopAfter: .now() + 5) {
+            if let h = self.hud {
+                h.dismiss()
+                self.tableView.reloadData()
+            }
+        }
 	}
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -63,51 +97,7 @@ class PeripheralTableViewController: UITableViewController {
 	
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		let peripheral = peripherals.allObjects[indexPath.row] as! CBPeripheral
-		if peripheral.state == .disconnected {
-			centralManager.connect(peripheral, options: nil)
-			hud = JGProgressHUD()
-			hud!.textLabel.text = "Connecting..."
-			hud!.show(in: UIApplication.shared.delegate!.window!!)
-			tableView.deselectRow(at: indexPath, animated: true)
-		}
-		else {
-			let viewController = OperationViewController(peripheral)
-			navigationController?.pushViewController(viewController, animated: true)
-		}
-	}
-}
-
-extension PeripheralTableViewController: CBCentralManagerDelegate
-{
-	func centralManagerDidUpdateState(_ central: CBCentralManager) {
-		
-	}
-	
-	func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-		if let h = hud {
-			h.indicatorView = JGProgressHUDSuccessIndicatorView()
-			h.textLabel.text = "Connected"
-			h.dismiss(afterDelay: 2)
-			navigationController?.pushViewController(OperationViewController(peripheral), animated: true)
-		}
-	}
-	
-	func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
-		if let h = hud {
-			h.indicatorView = JGProgressHUDErrorIndicatorView()
-			h.textLabel.text = "Connect failed"
-			h.dismiss(afterDelay: 2)
-		}
-	}
-	
-	func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-		print(advertisementData)
-		if let uuids = advertisementData[CBAdvertisementDataServiceUUIDsKey] as? Array<CBUUID> {
-			for uuid in uuids {
-				if uuid.uuidString == CBUUID(string: DeviceInfoServiceUUID).uuidString {
-					peripherals.add(peripheral)
-				}
-			}
-		}
+        let viewController = OperationViewController(peripheral)
+        navigationController?.pushViewController(viewController, animated: true)
 	}
 }

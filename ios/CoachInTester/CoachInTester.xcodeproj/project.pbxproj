@@ -17,6 +17,7 @@
 		E921173F20FF14FF00B6E557 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E921173E20FF14FF00B6E557 /* Assets.xcassets */; };
 		E921174220FF14FF00B6E557 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E921174020FF14FF00B6E557 /* LaunchScreen.storyboard */; };
 		E921174A20FF164200B6E557 /* PeripheralTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921174920FF164200B6E557 /* PeripheralTableViewController.swift */; };
+		E9A97B4B2104D84100A447A6 /* BLEConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A97B4A2104D84100A447A6 /* BLEConnectionManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		E921174120FF14FF00B6E557 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E921174320FF14FF00B6E557 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E921174920FF164200B6E557 /* PeripheralTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeripheralTableViewController.swift; sourceTree = "<group>"; };
+		E9A97B4A2104D84100A447A6 /* BLEConnectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEConnectionManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +91,7 @@
 				E921173720FF14FE00B6E557 /* AppDelegate.swift */,
 				E913820E2101315D0018DA02 /* UUID.swift */,
 				E921173920FF14FE00B6E557 /* ViewController.swift */,
+				E9A97B4A2104D84100A447A6 /* BLEConnectionManager.swift */,
 				E921174920FF164200B6E557 /* PeripheralTableViewController.swift */,
 				E91382102101390C0018DA02 /* OperationViewController.swift */,
 				E913821221013AFE0018DA02 /* ChannelViewController.swift */,
@@ -214,6 +217,7 @@
 			files = (
 				E913820F2101315D0018DA02 /* UUID.swift in Sources */,
 				E91382112101390C0018DA02 /* OperationViewController.swift in Sources */,
+				E9A97B4B2104D84100A447A6 /* BLEConnectionManager.swift in Sources */,
 				E921174A20FF164200B6E557 /* PeripheralTableViewController.swift in Sources */,
 				E921173A20FF14FE00B6E557 /* ViewController.swift in Sources */,
 				E913821321013AFE0018DA02 /* ChannelViewController.swift in Sources */,

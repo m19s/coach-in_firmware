@@ -10,17 +10,29 @@ import UIKit
 import CoreBluetooth
 import JGProgressHUD
 
-struct Row {
+class Row {
+    init(title: String, value: Data?, uuid: CBUUID) {
+        self.title = title
+        self.value = value
+        self.uuid = uuid
+    }
+    
 	let title: String
 	var value: Data?
 	let uuid: CBUUID
 }
 
-struct Section {
+class Section {
 	let title: String
-	let rows: [Row]
+	var rows: [Row]
 	let uuid: CBUUID
 	
+    init(title: String, rows: [Row], uuid: CBUUID) {
+        self.title = title
+        self.rows = rows
+        self.uuid = uuid
+    }
+    
 	func search(title: String) -> Row? {
 		for r in rows {
 			if r.title == title {
@@ -46,50 +58,103 @@ class OperationViewController: UITableViewController, CBPeripheralDelegate {
 	
 	private var peripheral: CBPeripheral?
 	private var hud: JGProgressHUD?
-	
+    private var observer = BLEConnectionObserver()
+    private var peripheralObserver = BLEPeripheralObserver()
+    
+    static let DeviceInfoSection = "Device Info"
+    static let EMSServiceSection = "EMS Service"
+    static let DeviceModeSection = "Device Mode"
+    
 	var items: [Section] = []
 
 	init(_ peripheral: CBPeripheral) {
 		super.init(style: .grouped)
 		self.peripheral = peripheral
-		self.peripheral?.delegate = self
 		
 		self.items = [
-			Section(title: "Device Info", rows: [
+            Section(title: OperationViewController.DeviceInfoSection, rows: [
 				Row(title: "Device name", value: nil, uuid: CBUUID(string: DeviceInfoServiceDeviceNameCharacteristicUUID)),
 				Row(title: "Device version", value: nil, uuid: CBUUID(string: DeviceInfoServiceDeviceVersionCharacteristicUUID)),
 				Row(title: "Firmware version", value: nil, uuid: CBUUID(string: DeviceInfoServiceDeviceFirmwareVersionCharacteristicUUID)),
 				], uuid: CBUUID(string: DeviceInfoServiceUUID)),
-			Section(title: "EMS Service", rows: [
+			Section(title: OperationViewController.EMSServiceSection, rows: [
 				Row(title: "Channel 1", value: nil, uuid: CBUUID(string: EMSServiceChannel1CharacteristicUUID)),
 				Row(title: "Channel 2", value: nil, uuid: CBUUID(string: EMSServiceChannel2CharacteristicUUID)),
 				Row(title: "Channel 3", value: nil, uuid: CBUUID(string: EMSServiceChannel3CharacteristicUUID)),
 				Row(title: "Channel 4", value: nil, uuid: CBUUID(string: EMSServiceChannel4CharacteristicUUID))
 				], uuid: CBUUID(string: EMSServiceUUID)),
-			Section(title: "Device mode", rows: [
+			Section(title: OperationViewController.DeviceModeSection, rows: [
 				Row(title: "Mode", value: nil, uuid: CBUUID(string: DeviceInfoServiceDeviceNameCharacteristicUUID))
 				], uuid: CBUUID(string: DeviceStatusServiceUUID))
 		]
+        
+        peripheralObserver.didDiscoverCharacteristics = { [weak self] (peripheral, service, error) in
+            guard let weakSelf = self else { return }
+            if let h = weakSelf.hud {
+                h.dismiss()
+                if let characteristics = service.characteristics {
+                    for c in characteristics {
+                        peripheral.readValue(for: c)
+                    }
+                }
+            }
+        }
+        
+        peripheralObserver.didUpdateValue = { [weak self] (peripheral, characteristic, error) in
+            guard let weakSelf = self else { return }
+            if error == nil {
+                for section in weakSelf.items {
+                    let rows = section.rows.filter({ (row) -> Bool in
+                        if row.uuid.uuidString == characteristic.uuid.uuidString {
+                            return true
+                        }
+                        return false
+                    })
+                    for row in rows {
+                        row.value = characteristic.value
+                    }
+                }
+                weakSelf.tableView.reloadData()
+            }
+        }
+        
+        peripheral.observers.append(peripheralObserver)
+        
+        observer.onConnect = { [weak self] (peripheral) in
+            guard let wealSelf = self else { return }
+            if let h = wealSelf.hud {
+                h.textLabel.text = "Discovering..."
+            }
+        }
+        
+        let manager = BLEConnectionManager.shared
+        manager.observers.append(observer)
+        
+        if peripheral.state == .disconnected {
+            BLEConnectionManager.shared.connect(peripheral: peripheral, options: nil)
+            hud = JGProgressHUD()
+            hud!.textLabel.text = "Connecting..."
+            hud!.show(in: UIApplication.shared.delegate!.window!!)
+        }
 	}
 	
 	required init?(coder aDecoder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
-	
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-		
-		hud = JGProgressHUD()
-		hud!.textLabel.text = "Loading..."
-		hud!.show(in: UIApplication.shared.delegate!.window!!)
-		peripheral!.discoverServices([CBUUID(string: DeviceInfoServiceUUID), CBUUID(string: EMSServiceUUID), CBUUID(string: DeviceStatusServiceUUID)])
+    
+    deinit {
+        let manager = BLEConnectionManager.shared
+        if let index = manager.observers.index(of: observer) {
+            manager.observers.remove(at: index)
+        }
     }
-	
-	override func viewDidAppear(_ animated: Bool) {
-		super.viewDidAppear(animated)
-	}
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if let indexPath = tableView.indexPathForSelectedRow {
+            tableView.deselectRow(at: indexPath, animated: true)
+        }
+    }
 
 	override func numberOfSections(in tableView: UITableView) -> Int {
 		return items.count
@@ -110,19 +175,44 @@ class OperationViewController: UITableViewController, CBPeripheralDelegate {
 			cell = UITableViewCell(style: .value1, reuseIdentifier: reuseIdentifier)
 		}
 		
+        if indexPath.section == 0 {
+            cell?.selectionStyle = .none
+        }
+        else {
+            cell?.selectionStyle = .default
+        }
+        
 		// Configure the cell...
 		let section = items[indexPath.section]
 		cell!.textLabel?.text = section.rows[indexPath.row].title
 		if let data = section.rows[indexPath.row].value, let value = String(data: data, encoding: .utf8) {
-			print(value)
 			cell!.detailTextLabel?.text = value
 		}
 		else {
-			cell!.detailTextLabel?.text = ""
+			cell!.detailTextLabel?.text = "-"
 		}
 		
 		return cell!
 	}
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+         tableView.deselectRow(at: indexPath, animated: true)
+        let section = items[indexPath.section]
+        
+        switch section.title {
+        case OperationViewController.EMSServiceSection: do {
+            let row = section.rows[indexPath.row]
+            let viewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ChannelViewController") as! ChannelViewController
+            viewController.peripheral = peripheral
+            viewController.characteristicUUID = row.uuid
+            navigationController?.pushViewController(viewController, animated: true)
+        }
+            break
+        default:
+
+            break
+        }
+    }
 
 	
 	// CBPeripheralDelegate

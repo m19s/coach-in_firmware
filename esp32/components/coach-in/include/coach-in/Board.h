@@ -9,6 +9,7 @@
 #include <StreamLogger/Logger.h>
 #include <coach-in/Configuration.h>
 #include <coach-in/Packet.h>
+#include <parallel_lines.h>
 
 #include <bitset>
 
@@ -84,7 +85,7 @@ namespace coach_in
 				drive_characteristic->setValue(&d, 1);
 
 				auto ems_drive_handler = new EMSDriveCharacteristicHandler();
-				ems_drive_handler->write_handler = [this](const char *data) {
+				ems_drive_handler->write_handler = [&](const char *data) {
 					m19s::coach_in::ESP32::DrivePacket packet((uint8_t)data[0]);
 					this->send_packet(&packet);
 				};
@@ -105,12 +106,24 @@ namespace coach_in
 				advertising_data.setManufacturerData(Configuration::FirmareVersion);
 				advertising->setAdvertisementData(advertising_data);
 				server->startAdvertising();
+
+				static m2d::FreeRTOS::Task task("packet task", 10, 1024 * 5, [&] {
+					parallel_lines::scheduler *s = parallel_lines::scheduler::shared_scheduler();
+					while (1) {
+						s->update();
+						vTaskDelay(25 / portTICK_PERIOD_MS);
+					}
+				});
+				task.run();
 			}
 
 			void send_packet(coach_in::ESP32::Packet *packet)
 			{
 				m2d::ESP32::SPITransaction t;
 				uint8_t type = packet->type();
+
+				Logger::I << std::bitset<16>(packet->to_16bits_data()).to_string() << Logger::endl;
+
 				t.set_tx_buffer(&type, 1);
 				assert(this->spi->transmit(t) == ESP_OK);
 
@@ -150,18 +163,23 @@ namespace coach_in
 			};
 
 		public:
+			bool go = false;
 			DevKit2(std::string name)
 			    : Board(Configuration::DeviceName + name)
 			{
 				auto channel_handler = new ChannelCharacteristicHandler();
 				channel_handler->write_handler = [this](const char *data) {
-					uint16_t packet_data = 0;
-					packet_data = (uint8_t)data[0];
-					packet_data <<= 8;
-					packet_data |= (uint8_t)data[1];
+					parallel_lines::scheduler *s = parallel_lines::scheduler::shared_scheduler();
 
-					m19s::coach_in::ESP32::ChannelPacket packet(packet_data);
-					this->send_packet(&packet);
+					s->push([this, data] {
+						uint16_t packet_data = 0;
+						packet_data = (uint8_t)data[0];
+						packet_data <<= 8;
+						packet_data |= (uint8_t)data[1];
+
+						m19s::coach_in::ESP32::ChannelPacket packet(packet_data);
+						this->send_packet(&packet);
+					});
 				};
 
 				ChannelPacket channel_packet(0, 0, 0, 0);
