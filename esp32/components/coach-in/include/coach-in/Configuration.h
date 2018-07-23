@@ -14,7 +14,7 @@ namespace coach_in
 	{
 		namespace Configuration
 		{
-			static const std::string DeviceName = "coach-in";
+			static const std::string DeviceName = "coach-in_DEVKIT2";
 			static const std::string DeviceVerson = "DEVKIT2";
 			static const std::string FirmareVersion = "v20180715";
 		}

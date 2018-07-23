@@ -147,7 +147,7 @@ namespace coach_in
 
 		public:
 			DevKit2(std::string name)
-			    : Board(Configuration::DeviceName + name)
+			    : Board(Configuration::DeviceName + "_" + name)
 			{
 				auto channel_handler = new ChannelCharacteristicHandler();
 				channel_handler->write_handler = [this](const char *data) {
