@@ -65,7 +65,9 @@ class PeripheralTableViewController: UITableViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        scan()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.scan()
+        }
     }
     
     // MARK: - Table view data source
