@@ -10,3 +10,9 @@
 [submodule "esp32/components/WS2812-Utility"]
 	path = esp32/components/WS2812-Utility
 	url = git@github.com:0x0c/WS2812-Utility.git
+[submodule "esp32/components/MPUdriver"]
+	path = esp32/components/MPUdriver
+	url = https://github.com/natanaeljr/esp32-MPU-driver.git
+[submodule "esp32/components/esp32-I2Cbus"]
+	path = esp32/components/esp32-I2Cbus
+	url = https://github.com/natanaeljr/esp32-I2Cbus.git

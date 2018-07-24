@@ -60,6 +60,8 @@ namespace coach_in
 				AlexaMode = 1
 			} Mode;
 
+			std::function<void()> channel_drive_handler;
+
 			Board(std::string name)
 			{
 				this->spi = new SPIWrapper(1000000, 3, (gpio_num_t)GPIO_NUM_18, (gpio_num_t)GPIO_NUM_23, (gpio_num_t)GPIO_NUM_19, (gpio_num_t)GPIO_NUM_5, VSPI_HOST, (SPI_DEVICE_TXBIT_LSBFIRST | SPI_DEVICE_RXBIT_LSBFIRST | SPI_DEVICE_NO_DUMMY));
