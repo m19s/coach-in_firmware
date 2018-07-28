@@ -5,14 +5,14 @@
 using namespace std;
 using namespace m19s::coach_in::Arduino;
 
-m19s::coach_in::Arduino::DevKit2 *board;
+volatile m19s::coach_in::Arduino::DevKit2 *board;
 
-volatile uint8_t counter = 0;
 ISR(SPI_STC_vect)
 {
 	byte c = SPDR; // grab byte from SPI Data Register
 
 	board->process_data(c);
+	Serial.println("reveiced: ");
 	Serial.println(c, BIN);
 }
 

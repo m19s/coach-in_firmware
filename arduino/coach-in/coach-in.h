@@ -113,6 +113,7 @@ namespace coach_in
 			    : rkmtlab::MultiEMS::Board(kNumberOfChannels)
 			{
 				spi_stack.setup(m2d::Arduino::SPI::Stack::Mode3, m2d::Arduino::SPI::Stack::LSBFirst, SPI_CLOCK_DIV8);
+				spi_stack.set_flush_command_setting(0xff, 1);
 
 				pwm.begin();
 				// Supported only 33~720Hz
@@ -141,18 +142,19 @@ namespace coach_in
 			UpdateType update()
 			{
 				if (this->spi_stack.available()) {
+					this->stack_flush();
 					uint8_t type = this->spi_stack.buffer[0];
 					if (type == 0) {
 						// drive packet
 						uint16_t data = this->spi_stack.buffer[1];
-						this->stack_flush();
-
 						auto packet = DrivePacket(data);
 						if (this->drive(packet)) {
 							if (packet.drive_all) {
+								Serial.println("packet type is drive all");
 								return DriveAll;
 							}
 							else {
+								Serial.println("packet type is drive");
 								return Drive;
 							}
 						}
@@ -161,9 +163,8 @@ namespace coach_in
 						// channel packet
 						uint16_t data = this->spi_stack.buffer[1] << 8;
 						data |= this->spi_stack.buffer[2];
-
-						this->stack_flush();
 						if (this->update_channel(ChannelPacket(data))) {
+							Serial.println("packet type is channel");
 							return Channel;
 						}
 					}
