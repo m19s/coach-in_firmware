@@ -16,3 +16,6 @@
 [submodule "esp32/components/esp32-I2Cbus"]
 	path = esp32/components/esp32-I2Cbus
 	url = https://github.com/natanaeljr/esp32-I2Cbus.git
+[submodule "esp32/components/esp32-SPIbus"]
+	path = esp32/components/esp32-SPIbus
+	url = https://github.com/natanaeljr/esp32-SPIbus.git
