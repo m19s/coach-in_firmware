@@ -11,9 +11,9 @@ ISR(SPI_STC_vect)
 {
 	byte c = SPDR; // grab byte from SPI Data Register
 
-	board->process_data(c);
-	Serial.println("reveiced: ");
+	Serial.print("reveiced: ");
 	Serial.println(c, BIN);
+	board->process_data(c);
 }
 
 void setup()
@@ -43,7 +43,8 @@ void loop()
 	else {
 		DevKit2::UpdateType type = board->update();
 		switch (type) {
-			case DevKit2::UpdateType::None:
+			case DevKit2::UpdateType::Invalid:
+				Serial.println("invalid");
 				break;
 			case DevKit2::UpdateType::Drive:
 				Serial.println("drive");

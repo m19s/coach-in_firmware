@@ -93,6 +93,8 @@ namespace coach_in
 				};
 				drive_characteristic->setCallbacks(ems_drive_handler);
 				this->device_status_service = server->createService(UUID::DeviceStatusServiceUUID.c_str());
+
+				gpio_set_direction(GPIO_NUM_5, GPIO_MODE_OUTPUT);
 			}
 
 			void run()
@@ -111,22 +113,39 @@ namespace coach_in
 
 			void send_packet(coach_in::ESP32::Packet *packet)
 			{
+				Logger::I << "send packet" << Logger::endl;
+				// Logger::I << std::bitset<16>(packet->to_16bits_data()).to_string() << Logger::endl;
+
+				this->send_flush_command();
+
 				m2d::ESP32::SPITransaction t;
 				uint8_t type = packet->type();
-
-				Logger::I << std::bitset<16>(packet->to_16bits_data()).to_string() << Logger::endl;
-
 				t.set_tx_buffer(&type, 1);
+				gpio_set_level(GPIO_NUM_5, 0);
 				assert(this->spi->transmit(t) == ESP_OK);
+				gpio_set_level(GPIO_NUM_5, 1);
+				vTaskDelay(40 / portTICK_PERIOD_MS);
 
 				for (uint8_t d : packet->to_byte_vector()) {
+					Logger::I << std::bitset<8>(d).to_string();
+					gpio_set_level(GPIO_NUM_5, 0);
 					t.set_tx_buffer(&d, 1);
 					assert(this->spi->transmit(t) == ESP_OK);
-					Logger::I << std::bitset<8>(d).to_string() << ", ";
-					vTaskDelay(20 / portTICK_PERIOD_MS);
+					gpio_set_level(GPIO_NUM_5, 1);
+					vTaskDelay(40 / portTICK_PERIOD_MS);
 				}
-
 				Logger::I << Logger::endl;
+			}
+
+			void send_flush_command()
+			{
+				m2d::ESP32::SPITransaction t;
+				uint8_t data = 0xff;
+				t.set_tx_buffer(&data, 1);
+				gpio_set_level(GPIO_NUM_5, 0);
+				assert(this->spi->transmit(t) == ESP_OK);
+				gpio_set_level(GPIO_NUM_5, 1);
+				vTaskDelay(40 / portTICK_PERIOD_MS);
 			}
 		};
 

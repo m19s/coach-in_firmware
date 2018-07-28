@@ -103,6 +103,7 @@ namespace coach_in
 		public:
 			typedef enum
 			{
+				Invalid = -1,
 				None = 0,
 				Drive = 1,
 				DriveAll = 2,
@@ -114,6 +115,7 @@ namespace coach_in
 			{
 				spi_stack.setup(m2d::Arduino::SPI::Stack::Mode3, m2d::Arduino::SPI::Stack::LSBFirst, SPI_CLOCK_DIV8);
 				spi_stack.set_flush_command_setting(0xff, 1);
+				spi_stack.debug_mode = true;
 
 				pwm.begin();
 				// Supported only 33~720Hz
@@ -142,7 +144,6 @@ namespace coach_in
 			UpdateType update()
 			{
 				if (this->spi_stack.available()) {
-					this->stack_flush();
 					uint8_t type = this->spi_stack.buffer[0];
 					if (type == 0) {
 						// drive packet
@@ -151,10 +152,12 @@ namespace coach_in
 						if (this->drive(packet)) {
 							if (packet.drive_all) {
 								Serial.println("packet type is drive all");
+								this->stack_flush();
 								return DriveAll;
 							}
 							else {
 								Serial.println("packet type is drive");
+								this->stack_flush();
 								return Drive;
 							}
 						}
@@ -165,8 +168,12 @@ namespace coach_in
 						data |= this->spi_stack.buffer[2];
 						if (this->update_channel(ChannelPacket(data))) {
 							Serial.println("packet type is channel");
+							this->stack_flush();
 							return Channel;
 						}
+					}
+					else {
+						return Invalid;
 					}
 				}
 				return None;

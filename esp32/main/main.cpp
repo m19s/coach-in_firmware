@@ -21,11 +21,7 @@ void app_main()
 
 	static auto devkit = ESP32::DevKit2(std::string(CONFIG_COACH_IN_DEVICE_NAME));
 	devkit.run();
-	logger.debug << "coach-in start" << Logger::endl;
-
-	static auto sensor_board = Peripheral::Board();
-	sensor_board.run();
-
-	gpio_set_direction(GPIO_NUM_5, GPIO_MODE_OUTPUT);
-	gpio_set_level(GPIO_NUM_5, 0);
+	logger.info << "coach-in start" << Logger::endl;
+	// static auto sensor_board = Peripheral::Board();
+	// sensor_board.run();
 }
