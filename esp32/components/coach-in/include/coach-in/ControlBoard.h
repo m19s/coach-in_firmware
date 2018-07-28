@@ -65,6 +65,7 @@ namespace coach_in
 			Board(std::string name)
 			{
 				this->spi = new SPIWrapper(1000000, 3, (gpio_num_t)GPIO_NUM_18, (gpio_num_t)GPIO_NUM_23, (gpio_num_t)GPIO_NUM_19, (gpio_num_t)GPIO_NUM_5, VSPI_HOST, (SPI_DEVICE_TXBIT_LSBFIRST | SPI_DEVICE_RXBIT_LSBFIRST | SPI_DEVICE_NO_DUMMY));
+				gpio_set_direction(GPIO_NUM_5, GPIO_MODE_OUTPUT);
 
 				this->led_strip = new LED::Strip(GPIO_NUM_17, Configuration::LEDStripLength, RMT_CHANNEL_1);
 
@@ -93,8 +94,6 @@ namespace coach_in
 				};
 				drive_characteristic->setCallbacks(ems_drive_handler);
 				this->device_status_service = server->createService(UUID::DeviceStatusServiceUUID.c_str());
-
-				gpio_set_direction(GPIO_NUM_5, GPIO_MODE_OUTPUT);
 			}
 
 			void run()
@@ -114,7 +113,6 @@ namespace coach_in
 			void send_packet(coach_in::ESP32::Packet *packet)
 			{
 				Logger::I << "send packet" << Logger::endl;
-				// Logger::I << std::bitset<16>(packet->to_16bits_data()).to_string() << Logger::endl;
 
 				this->send_flush_command();
 

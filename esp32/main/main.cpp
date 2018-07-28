@@ -19,9 +19,11 @@ void app_main()
 {
 	static Logger::Group logger("coach_in");
 
+	static auto sensor_board = Peripheral::Board();
+	sensor_board.run();
+
 	static auto devkit = ESP32::DevKit2(std::string(CONFIG_COACH_IN_DEVICE_NAME));
 	devkit.run();
+
 	logger.info << "coach-in start" << Logger::endl;
-	// static auto sensor_board = Peripheral::Board();
-	// sensor_board.run();
 }
