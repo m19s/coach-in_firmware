@@ -23,20 +23,20 @@ namespace coach_in
 		public:
 			Board()
 			{
-				i2c0.setTimeout(10000);
-				i2c0.begin(SDA, SCL, CLOCK_SPEED);
-				MPU.setBus(i2c0);
-				MPU.setAddr(mpud::MPU_I2CADDRESS_AD0_LOW);
+				// i2c0.setTimeout(10000);
+				// i2c0.begin(SDA, SCL, CLOCK_SPEED);
+				// MPU.setBus(i2c0);
+				// MPU.setAddr(mpud::MPU_I2CADDRESS_AD0_LOW);
 
-				while (esp_err_t err = MPU.testConnection()) {
-					uint8_t wai = MPU.whoAmI();
-					ESP_LOGE("MPU", "Failed to connect to the MPU, error=%#X, %x", err, wai);
-					vTaskDelay(1000 / portTICK_PERIOD_MS);
-				}
-				ESP_LOGI("MPU", "MPU connection successful!");
+				// while (esp_err_t err = MPU.testConnection()) {
+				// 	uint8_t wai = MPU.whoAmI();
+				// 	ESP_LOGE("MPU", "Failed to connect to the MPU, error=%#X, %x", err, wai);
+				// 	vTaskDelay(1000 / portTICK_PERIOD_MS);
+				// }
+				// ESP_LOGI("MPU", "MPU connection successful!");
 
-				// Initialize
-				ESP_ERROR_CHECK(MPU.initialize()); // initialize the chip and set initial configurations
+				// // Initialize
+				// ESP_ERROR_CHECK(MPU.initialize()); // initialize the chip and set initial configurations
 				// Setup with your configurations
 				// ESP_ERROR_CHECK(MPU.setSampleRate(50)); // set sample rate to 50 Hz
 				// ESP_ERROR_CHECK(MPU.setGyroFullScale(mpud::GYRO_FS_500DPS));
@@ -65,7 +65,7 @@ namespace coach_in
 						vTaskDelay(20 / portTICK_RATE_MS);
 					}
 				});
-				task.run(1);
+				// task.run(1);
 			}
 		};
 	}

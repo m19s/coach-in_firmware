@@ -111,12 +111,15 @@ namespace coach_in
 
 				static m2d::FreeRTOS::Task led_task("LED task", 10, 1024 * 3, [&] {
 					while (1) {
-						for (int i = 1; i < 16; i++) {
+						Logger::I << "green" << Logger::endl;
+						for (int i = 0; i < 16; i++) {
 							auto color = LED::Color::blue();
 							this->led_strip->setPixel(i, color.pixel_color());
 						}
 						vTaskDelay(1000 / portTICK_RATE_MS);
-						for (int i = 1; i < 16; i++) {
+
+						Logger::I << "red" << Logger::endl;
+						for (int i = 0; i < 16; i++) {
 							auto color = LED::Color::red();
 							this->led_strip->setPixel(i, color.pixel_color());
 						}
