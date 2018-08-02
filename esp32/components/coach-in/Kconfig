@@ -1,7 +1,19 @@
 menu "coach-in Component Settings"
 
+choice COACH_IN_HAND
+    prompt "Device settings"
+    default COACH_IN_HAND_LEFT
+    help
+	    Choose the side of groove device.
+
+config COACH_IN_HAND_LEFT
+    bool "LEFT HAND"
+config COACH_IN_HAND_RIGHT
+    bool "RIGHT HAND"
+endchoice
+
 config COACH_IN_DEVICE_NAME
-    string "A name of the device."
+    string "Device name"
 	default "DEBUG"
     help
 	    The name will appear in an app.
