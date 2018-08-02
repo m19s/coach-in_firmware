@@ -73,20 +73,20 @@ class OperationViewController: UITableViewController, CBPeripheralDelegate {
 		
 		self.items = [
             Section(title: OperationViewController.DeviceInfoSection, rows: [
-				Row(title: "Device name", value: nil, uuid: CBUUID(string: DeviceInfoServiceDeviceNameCharacteristicUUID)),
-				Row(title: "Device version", value: nil, uuid: CBUUID(string: DeviceInfoServiceDeviceVersionCharacteristicUUID)),
-				Row(title: "Firmware version", value: nil, uuid: CBUUID(string: DeviceInfoServiceDeviceFirmwareVersionCharacteristicUUID)),
-				], uuid: CBUUID(string: DeviceInfoServiceUUID)),
+				Row(title: "Device name", value: nil, uuid: DeviceInfoServiceDeviceNameCharacteristicUUID),
+				Row(title: "Device version", value: nil, uuid: DeviceInfoServiceDeviceVersionCharacteristicUUID),
+				Row(title: "Firmware version", value: nil, uuid: DeviceInfoServiceDeviceFirmwareVersionCharacteristicUUID),
+				], uuid: DeviceInfoServiceUUID),
 			Section(title: OperationViewController.EMSServiceSection, rows: [
-                Row(title: "Drive", value: nil, uuid: CBUUID(string: EMSServiceDriveCharacteristicUUID)),
-				Row(title: "Channel 1", value: nil, uuid: CBUUID(string: EMSServiceChannel1CharacteristicUUID)),
-				Row(title: "Channel 2", value: nil, uuid: CBUUID(string: EMSServiceChannel2CharacteristicUUID)),
-				Row(title: "Channel 3", value: nil, uuid: CBUUID(string: EMSServiceChannel3CharacteristicUUID)),
-				Row(title: "Channel 4", value: nil, uuid: CBUUID(string: EMSServiceChannel4CharacteristicUUID))
-				], uuid: CBUUID(string: EMSServiceUUID)),
+                Row(title: "Drive", value: nil, uuid: EMSServiceDriveCharacteristicUUID),
+				Row(title: "Channel 1", value: nil, uuid: EMSServiceChannel1CharacteristicUUID),
+				Row(title: "Channel 2", value: nil, uuid: EMSServiceChannel2CharacteristicUUID),
+				Row(title: "Channel 3", value: nil, uuid: EMSServiceChannel3CharacteristicUUID),
+				Row(title: "Channel 4", value: nil, uuid: EMSServiceChannel4CharacteristicUUID)
+				], uuid: EMSServiceUUID),
 			Section(title: OperationViewController.DeviceModeSection, rows: [
-				Row(title: "Mode", value: nil, uuid: CBUUID(string: DeviceInfoServiceDeviceNameCharacteristicUUID))
-				], uuid: CBUUID(string: DeviceStatusServiceUUID))
+				Row(title: "Mode", value: nil, uuid: DeviceInfoServiceDeviceNameCharacteristicUUID)
+				], uuid: DeviceStatusServiceUUID)
 		]
         
         peripheralObserver.didDiscoverCharacteristics = { [weak self] (peripheral, service, error) in
@@ -232,19 +232,19 @@ class OperationViewController: UITableViewController, CBPeripheralDelegate {
 			var uuids: [CBUUID] = []
 			for s in services {
 				switch s.uuid.uuidString {
-				case CBUUID(string: DeviceInfoServiceUUID).uuidString :
-					uuids.append(CBUUID(string: DeviceInfoServiceDeviceNameCharacteristicUUID))
-					uuids.append(CBUUID(string: DeviceInfoServiceDeviceVersionCharacteristicUUID))
-					uuids.append(CBUUID(string: DeviceInfoServiceDeviceFirmwareVersionCharacteristicUUID))
+				case DeviceInfoServiceUUID.uuidString :
+					uuids.append(DeviceInfoServiceDeviceNameCharacteristicUUID)
+					uuids.append(DeviceInfoServiceDeviceVersionCharacteristicUUID)
+					uuids.append(DeviceInfoServiceDeviceFirmwareVersionCharacteristicUUID)
 					break
-				case CBUUID(string: EMSServiceUUID).uuidString :
-					uuids.append(CBUUID(string: EMSServiceChannel1CharacteristicUUID))
-					uuids.append(CBUUID(string: EMSServiceChannel2CharacteristicUUID))
-					uuids.append(CBUUID(string: EMSServiceChannel3CharacteristicUUID))
-					uuids.append(CBUUID(string: EMSServiceChannel4CharacteristicUUID))
+				case EMSServiceUUID.uuidString :
+					uuids.append(EMSServiceChannel1CharacteristicUUID)
+					uuids.append(EMSServiceChannel2CharacteristicUUID)
+					uuids.append(EMSServiceChannel3CharacteristicUUID)
+					uuids.append(EMSServiceChannel4CharacteristicUUID)
 					break
-				case CBUUID(string: DeviceStatusServiceModeCharacteristicUUID).uuidString :
-					uuids.append(CBUUID(string: DeviceStatusServiceModeCharacteristicUUID))
+				case DeviceStatusServiceModeCharacteristicUUID.uuidString :
+					uuids.append(DeviceStatusServiceModeCharacteristicUUID)
 					break
 				default:
 					break
@@ -269,13 +269,13 @@ class OperationViewController: UITableViewController, CBPeripheralDelegate {
 	func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
 		var section: Section?
 		switch characteristic.service.uuid.uuidString {
-		case CBUUID(string: DeviceInfoServiceUUID).uuidString:
+		case DeviceInfoServiceUUID.uuidString:
 			section = items[0]
 			break
-		case CBUUID(string: EMSServiceUUID).uuidString:
+		case EMSServiceUUID.uuidString:
 			section = items[1]
 			break
-		case CBUUID(string: DeviceStatusServiceUUID).uuidString:
+		case DeviceStatusServiceUUID.uuidString:
 			section = items[2]
 			break
 		default:
@@ -283,7 +283,7 @@ class OperationViewController: UITableViewController, CBPeripheralDelegate {
 			break
 		}
 		
-		if let s = section, var row = s.search(uuid: characteristic.uuid) {
+        if let s = section, let row = s.search(uuid: characteristic.uuid) {
 			row.value = characteristic.value
 			tableView.reloadData()
 		}

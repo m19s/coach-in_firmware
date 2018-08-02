@@ -25,7 +25,7 @@ class PeripheralTableViewController: UITableViewController {
             guard let weakSelf = self else { return }
             if let uuids = advertisementData[CBAdvertisementDataServiceUUIDsKey] as? Array<CBUUID> {
                 for uuid in uuids {
-                    if uuid.uuidString == CBUUID(string: DeviceInfoServiceUUID).uuidString {
+                    if uuid.uuidString == DeviceInfoServiceUUID.uuidString {
                         weakSelf.peripherals.add(peripheral)
                         weakSelf.tableView.reloadData()
                         if let h = weakSelf.hud {
@@ -88,7 +88,7 @@ class PeripheralTableViewController: UITableViewController {
         hud!.show(in: UIApplication.shared.delegate!.window!!)
         
         let manager = BLEConnectionManager.shared
-        manager.scan(withServices: [CBUUID(string: DeviceInfoServiceUUID)], options: nil, stopAfter: .now() + 5) {
+        manager.scan(withServices: [DeviceInfoServiceUUID], options: nil, stopAfter: .now() + 5) {
             if let h = self.hud {
                 h.dismiss()
                 self.tableView.reloadData()
