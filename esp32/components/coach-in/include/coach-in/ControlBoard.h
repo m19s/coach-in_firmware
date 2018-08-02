@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sdkconfig.h>
+
 #include <cstdlib>
 #include <functional>
 #include <sdkconfig.h>
@@ -40,6 +42,7 @@ namespace coach_in
 			m2d::ESP32::LED::Strip *led_strip;
 
 			BLEServer *server;
+			BLEService *device_direction_service;
 			BLEService *device_info_service;
 			BLEService *device_status_service;
 			BLEService *ems_service;
@@ -79,6 +82,12 @@ namespace coach_in
 				device_version_characteristic->setValue(Configuration::DeviceVerson);
 				BLECharacteristic *device_firmware_version_characteristic = device_info_service->createCharacteristic(UUID::DeviceInfoServiceDeviceFirmwareVersionCharacteristicUUID.c_str(), BLECharacteristic::PROPERTY_READ);
 				device_firmware_version_characteristic->setValue(Configuration::FirmareVersion);
+				BLECharacteristic *device_direction_characteristic = device_info_service->createCharacteristic(UUID::DeviceInfoServiceDeviceDirectionCharacteristicUUID.c_str(), BLECharacteristic::PROPERTY_READ);
+#ifdef CONFIG_COACH_IN_HAND_RIGHT
+				device_direction_characteristic->setValue("LEFT");
+#else
+				device_direction_characteristic->setValue("RIGHT");
+#endif
 
 				this->ems_service = server->createService(UUID::EMSServiceUUID.c_str());
 				ems_service->createCharacteristic(UUID::EMSServiceStatusCharacteristicUUID.c_str(), BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
@@ -111,18 +120,19 @@ namespace coach_in
 
 				static m2d::FreeRTOS::Task led_task("LED task", 10, 1024 * 3, [&] {
 					while (1) {
-						Logger::I << "green" << Logger::endl;
-						for (int i = 0; i < 16; i++) {
-							auto color = LED::Color::blue();
-							this->led_strip->setPixel(i, color.pixel_color());
-						}
+						// for (int i = 1; i < 16; i++) {
+						// 	auto color = LED::Color::green(80);
+						// 	this->led_strip->setPixel(i, color.pixel_color());
+						// }
+						auto color = LED::Color::green(80);
+						this->led_strip->setPixel(5, color.pixel_color());
 						vTaskDelay(1000 / portTICK_RATE_MS);
-
-						Logger::I << "red" << Logger::endl;
-						for (int i = 0; i < 16; i++) {
-							auto color = LED::Color::red();
-							this->led_strip->setPixel(i, color.pixel_color());
-						}
+						// for (int i = 1; i < 16; i++) {
+						// 	auto color = LED::Color::red(80);
+						// 	this->led_strip->setPixel(i, color.pixel_color());
+						// }
+						color = LED::Color::red(80);
+						this->led_strip->setPixel(5, color.pixel_color());
 						vTaskDelay(1000 / portTICK_RATE_MS);
 					}
 				});

@@ -16,7 +16,7 @@ namespace coach_in
 		{
 			static const std::string DeviceName = "coach-in_DEVKIT2";
 			static const std::string DeviceVerson = "DEVKIT2";
-			static const std::string FirmareVersion = "v20180715";
+			static const std::string FirmareVersion = "v20180802";
 
 			static const int LEDStripLength = 16;
 		}
@@ -24,10 +24,10 @@ namespace coach_in
 		namespace UUID
 		{
 			static const std::string DeviceInfoServiceUUID = "6f876815-73fa-49eb-9e5f-052c2b448430";
-
 			static const std::string DeviceInfoServiceDeviceNameCharacteristicUUID = "6f876815-73fa-49eb-9e5f-052c2b448431";
 			static const std::string DeviceInfoServiceDeviceVersionCharacteristicUUID = "6f876815-73fa-49eb-9e5f-052c2b448432";
 			static const std::string DeviceInfoServiceDeviceFirmwareVersionCharacteristicUUID = "6f876815-73fa-49eb-9e5f-052c2b448433";
+			static const std::string DeviceInfoServiceDeviceDirectionCharacteristicUUID = "6f876815-73fa-49eb-9e5f-052c2b448434";
 
 			static const std::string EMSServiceUUID = "6f876815-73fa-49eb-9e5f-152c2b448440";
 			static const std::string EMSServiceStatusCharacteristicUUID = "6f876815-73fa-49eb-9e5f-152c2b448441";

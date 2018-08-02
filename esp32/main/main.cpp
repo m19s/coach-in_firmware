@@ -25,5 +25,11 @@ void app_main()
 	static auto devkit = ESP32::DevKit2(std::string(CONFIG_COACH_IN_DEVICE_NAME));
 	devkit.run();
 
-	logger.info << "coach-in start" << Logger::endl;
+	logger.info << "coach-in ";
+#ifdef CONFIG_COACH_IN_HAND_RIGHT
+	logger.info << "right";
+#else
+	logger.info << "left";
+#endif
+	logger.info << Logger::endl;
 }
