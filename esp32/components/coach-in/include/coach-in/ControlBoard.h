@@ -118,25 +118,36 @@ namespace coach_in
 				advertising->setAdvertisementData(advertising_data);
 				server->startAdvertising();
 
-				static m2d::FreeRTOS::Task led_task("LED task", 10, 1024 * 3, [&] {
-					while (1) {
-						// for (int i = 1; i < 16; i++) {
-						// 	auto color = LED::Color::green(80);
-						// 	this->led_strip->setPixel(i, color.pixel_color());
-						// }
-						auto color = LED::Color::green(80);
-						this->led_strip->setPixel(5, color.pixel_color());
-						vTaskDelay(1000 / portTICK_RATE_MS);
-						// for (int i = 1; i < 16; i++) {
-						// 	auto color = LED::Color::red(80);
-						// 	this->led_strip->setPixel(i, color.pixel_color());
-						// }
-						color = LED::Color::red(80);
-						this->led_strip->setPixel(5, color.pixel_color());
-						vTaskDelay(1000 / portTICK_RATE_MS);
+				// static m2d::FreeRTOS::Task led_task("LED task", 10, 1024 * 5, [&] {
+				// 	while (1) {
+				// 		for (int i = 1; i < 16; i++) {
+				// 			auto color = LED::Color::green(80);
+				// 			this->led_strip->setPixel(i, color.pixel_color());
+				// 		}
+				// 		vTaskDelay(1000 / portTICK_RATE_MS);
+				// 		for (int i = 1; i < 16; i++) {
+				// 			auto color = LED::Color::red(80);
+				// 			this->led_strip->setPixel(i, color.pixel_color());
+				// 		}
+				// 		vTaskDelay(1000 / portTICK_RATE_MS);
+				// 	}
+				// });
+				// led_task.run();
+
+				while (1) {
+					for (int i = 0; i < 16; i++) {
+						auto color = LED::Color::green();
+						this->led_strip->setPixel(i, color.pixel_color());
 					}
-				});
-				led_task.run();
+					Logger::I << "green" << Logger::endl;
+					vTaskDelay(1000 / portTICK_RATE_MS);
+					for (int i = 0; i < 16; i++) {
+						auto color = LED::Color::red();
+						this->led_strip->setPixel(i, color.pixel_color());
+					}
+					Logger::I << "red" << Logger::endl;
+					vTaskDelay(1000 / portTICK_RATE_MS);
+				}
 			}
 
 			void send_packet(coach_in::ESP32::Packet *packet)
