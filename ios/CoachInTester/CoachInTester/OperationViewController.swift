@@ -76,6 +76,7 @@ class OperationViewController: UITableViewController, CBPeripheralDelegate {
 				Row(title: "Device name", value: nil, uuid: DeviceInfoServiceDeviceNameCharacteristicUUID),
 				Row(title: "Device version", value: nil, uuid: DeviceInfoServiceDeviceVersionCharacteristicUUID),
 				Row(title: "Firmware version", value: nil, uuid: DeviceInfoServiceDeviceFirmwareVersionCharacteristicUUID),
+                Row(title: "Type", value: nil, uuid: DeviceInfoServiceDeviceDirectionCharacteristicUUID)
 				], uuid: DeviceInfoServiceUUID),
 			Section(title: OperationViewController.EMSServiceSection, rows: [
                 Row(title: "Drive", value: nil, uuid: EMSServiceDriveCharacteristicUUID),
@@ -236,6 +237,7 @@ class OperationViewController: UITableViewController, CBPeripheralDelegate {
 					uuids.append(DeviceInfoServiceDeviceNameCharacteristicUUID)
 					uuids.append(DeviceInfoServiceDeviceVersionCharacteristicUUID)
 					uuids.append(DeviceInfoServiceDeviceFirmwareVersionCharacteristicUUID)
+                    uuids.append(DeviceInfoServiceDeviceDirectionCharacteristicUUID)
 					break
 				case EMSServiceUUID.uuidString :
 					uuids.append(EMSServiceChannel1CharacteristicUUID)
