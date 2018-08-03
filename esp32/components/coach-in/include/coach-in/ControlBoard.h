@@ -10,9 +10,10 @@
 #include <WS2812-Utility/LED.h>
 
 #include <BLEDevice.h>
-#include <SPIWrapper.h>
+
 #include <coach-in/Configuration.h>
 #include <coach-in/Packet.h>
+#include <driver/uart.h>
 
 #include <bitset>
 
@@ -37,8 +38,6 @@ namespace coach_in
 		class Board
 		{
 		protected:
-			SPIWrapper *spi;
-
 			m2d::ESP32::LED::Strip *led_strip;
 
 			BLEServer *server;
@@ -67,8 +66,19 @@ namespace coach_in
 
 			Board(std::string name)
 			{
-				this->spi = new SPIWrapper(1000000, 3, (gpio_num_t)GPIO_NUM_18, (gpio_num_t)GPIO_NUM_23, (gpio_num_t)GPIO_NUM_19, (gpio_num_t)GPIO_NUM_5, VSPI_HOST, (SPI_DEVICE_TXBIT_LSBFIRST | SPI_DEVICE_RXBIT_LSBFIRST | SPI_DEVICE_NO_DUMMY));
-				gpio_set_direction(GPIO_NUM_5, GPIO_MODE_OUTPUT);
+				auto tx = (gpio_num_t)GPIO_NUM_5; // D11
+				auto rx = (gpio_num_t)GPIO_NUM_19; // D10
+
+				uart_config_t uart_config = {
+					.baud_rate = 4800,
+					.data_bits = UART_DATA_8_BITS,
+					.parity = UART_PARITY_DISABLE,
+					.stop_bits = UART_STOP_BITS_1,
+					.flow_ctrl = UART_HW_FLOWCTRL_DISABLE
+				};
+				ESP_ERROR_CHECK(uart_param_config(UART_NUM_1, &uart_config));
+				ESP_ERROR_CHECK(uart_set_pin(UART_NUM_1, tx, rx, (gpio_num_t)UART_PIN_NO_CHANGE, (gpio_num_t)UART_PIN_NO_CHANGE));
+				ESP_ERROR_CHECK(uart_driver_install(UART_NUM_1, 1024 * 2, 0, 0, NULL, 0));
 
 				this->led_strip = new LED::Strip(GPIO_NUM_17, Configuration::LEDStripLength, RMT_CHANNEL_1);
 
@@ -118,36 +128,23 @@ namespace coach_in
 				advertising->setAdvertisementData(advertising_data);
 				server->startAdvertising();
 
-				// static m2d::FreeRTOS::Task led_task("LED task", 10, 1024 * 5, [&] {
-				// 	while (1) {
-				// 		for (int i = 1; i < 16; i++) {
-				// 			auto color = LED::Color::green(80);
-				// 			this->led_strip->setPixel(i, color.pixel_color());
-				// 		}
-				// 		vTaskDelay(1000 / portTICK_RATE_MS);
-				// 		for (int i = 1; i < 16; i++) {
-				// 			auto color = LED::Color::red(80);
-				// 			this->led_strip->setPixel(i, color.pixel_color());
-				// 		}
-				// 		vTaskDelay(1000 / portTICK_RATE_MS);
-				// 	}
-				// });
-				// led_task.run();
-
-				while (1) {
-					for (int i = 0; i < 16; i++) {
-						auto color = LED::Color::green();
-						this->led_strip->setPixel(i, color.pixel_color());
+				static m2d::FreeRTOS::Task led_task("LED task", 10, 1024 * 5, [&] {
+					while (1) {
+						for (int i = 0; i < 16; i++) {
+							auto color = LED::Color::green(80);
+							this->led_strip->setPixel(i, color.pixel_color());
+						}
+						this->led_strip->show();
+						vTaskDelay(1000 / portTICK_RATE_MS);
+						for (int i = 0; i < 16; i++) {
+							auto color = LED::Color::red(80);
+							this->led_strip->setPixel(i, color.pixel_color());
+						}
+						this->led_strip->show();
+						vTaskDelay(1000 / portTICK_RATE_MS);
 					}
-					Logger::I << "green" << Logger::endl;
-					vTaskDelay(1000 / portTICK_RATE_MS);
-					for (int i = 0; i < 16; i++) {
-						auto color = LED::Color::red();
-						this->led_strip->setPixel(i, color.pixel_color());
-					}
-					Logger::I << "red" << Logger::endl;
-					vTaskDelay(1000 / portTICK_RATE_MS);
-				}
+				});
+				led_task.run();
 			}
 
 			void send_packet(coach_in::ESP32::Packet *packet)
@@ -156,34 +153,24 @@ namespace coach_in
 
 				this->send_flush_command();
 
-				m2d::ESP32::SPITransaction t;
 				uint8_t type = packet->type();
-				t.set_tx_buffer(&type, 1);
-				gpio_set_level(GPIO_NUM_5, 0);
-				assert(this->spi->transmit(t) == ESP_OK);
-				gpio_set_level(GPIO_NUM_5, 1);
-				vTaskDelay(40 / portTICK_PERIOD_MS);
+				uart_write_bytes(UART_NUM_1, (const char *)&type, 1);
+				Logger::I << std::bitset<8>(type).to_string() << ", ";
+				vTaskDelay(50 / portTICK_PERIOD_MS);
 
 				for (uint8_t d : packet->to_byte_vector()) {
-					Logger::I << std::bitset<8>(d).to_string();
-					gpio_set_level(GPIO_NUM_5, 0);
-					t.set_tx_buffer(&d, 1);
-					assert(this->spi->transmit(t) == ESP_OK);
-					gpio_set_level(GPIO_NUM_5, 1);
-					vTaskDelay(40 / portTICK_PERIOD_MS);
+					Logger::I << std::bitset<8>(d).to_string() << ", ";
+					uart_write_bytes(UART_NUM_1, (const char *)&d, 1);
+					vTaskDelay(50 / portTICK_PERIOD_MS);
 				}
 				Logger::I << Logger::endl;
 			}
 
 			void send_flush_command()
 			{
-				m2d::ESP32::SPITransaction t;
 				uint8_t data = 0xff;
-				t.set_tx_buffer(&data, 1);
-				gpio_set_level(GPIO_NUM_5, 0);
-				assert(this->spi->transmit(t) == ESP_OK);
-				gpio_set_level(GPIO_NUM_5, 1);
-				vTaskDelay(40 / portTICK_PERIOD_MS);
+				uart_write_bytes(UART_NUM_1, (const char *)&data, 1);
+				vTaskDelay(50 / portTICK_PERIOD_MS);
 			}
 		};
 

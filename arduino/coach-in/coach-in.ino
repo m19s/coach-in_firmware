@@ -1,25 +1,19 @@
 #include "coach-in.h"
+#include <SoftwareSerial.h>
 #include <StandardCplusplus.h>
 #include <vector>
+SoftwareSerial esp_serial(10, 11); // RX, TX
 
 using namespace std;
 using namespace m19s::coach_in::Arduino;
 
 volatile m19s::coach_in::Arduino::DevKit2 *board;
 
-ISR(SPI_STC_vect)
-{
-	byte c = SPDR; // grab byte from SPI Data Register
-
-	Serial.print("reveiced: ");
-	Serial.println(c, BIN);
-	board->process_data(c);
-}
-
 void setup()
 {
 	board = new m19s::coach_in::Arduino::DevKit2();
 	Serial.begin(115200);
+	esp_serial.begin(4800);
 	Serial.println("ready");
 }
 
@@ -39,6 +33,10 @@ void loop()
 		}
 
 		board->driveAll();
+	}
+	else if (esp_serial.available()) {
+		char c = esp_serial.read();
+		board->process_data(c);
 	}
 	else {
 		DevKit2::UpdateType type = board->update();

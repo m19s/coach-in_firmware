@@ -23,24 +23,21 @@ namespace coach_in
 		public:
 			Board()
 			{
-				// i2c0.setTimeout(10000);
-				// i2c0.begin(SDA, SCL, CLOCK_SPEED);
-				// MPU.setBus(i2c0);
-				// MPU.setAddr(mpud::MPU_I2CADDRESS_AD0_LOW);
+				i2c0.setTimeout(10000);
+				i2c0.begin(SDA, SCL, CLOCK_SPEED);
+				MPU.setBus(i2c0);
+				MPU.setAddr(mpud::MPU_I2CADDRESS_AD0_LOW);
 
-				// while (esp_err_t err = MPU.testConnection()) {
-				// 	uint8_t wai = MPU.whoAmI();
-				// 	ESP_LOGE("MPU", "Failed to connect to the MPU, error=%#X, %x", err, wai);
-				// 	vTaskDelay(1000 / portTICK_PERIOD_MS);
-				// }
-				// ESP_LOGI("MPU", "MPU connection successful!");
-
-				// // Initialize
-				// ESP_ERROR_CHECK(MPU.initialize()); // initialize the chip and set initial configurations
-				// Setup with your configurations
-				// ESP_ERROR_CHECK(MPU.setSampleRate(50)); // set sample rate to 50 Hz
-				// ESP_ERROR_CHECK(MPU.setGyroFullScale(mpud::GYRO_FS_500DPS));
-				// ESP_ERROR_CHECK(MPU.setAccelFullScale(mpud::ACCEL_FS_4G));
+				while (esp_err_t err = MPU.testConnection()) {
+					uint8_t wai = MPU.whoAmI();
+					ESP_LOGE("MPU", "Failed to connect to the MPU, error=%#X, %x", err, wai);
+					vTaskDelay(1000 / portTICK_PERIOD_MS);
+				}
+				ESP_LOGI("MPU", "MPU connection successful!");
+				ESP_ERROR_CHECK(MPU.initialize());
+				ESP_ERROR_CHECK(MPU.setSampleRate(50));
+				ESP_ERROR_CHECK(MPU.setGyroFullScale(mpud::GYRO_FS_500DPS));
+				ESP_ERROR_CHECK(MPU.setAccelFullScale(mpud::ACCEL_FS_4G));
 			}
 
 			void run()
@@ -60,12 +57,12 @@ namespace coach_in
 						accelG = mpud::accelGravity(accelRaw, mpud::ACCEL_FS_4G);
 						gyroDPS = mpud::gyroDegPerSec(gyroRaw, mpud::GYRO_FS_500DPS);
 						// Debug
-						printf("accel: [%+6.2f %+6.2f %+6.2f ] (G) \t", accelG.x, accelG.y, accelG.z);
-						printf("gyro: [%+7.2f %+7.2f %+7.2f ] (º/s)\n", gyroDPS[0], gyroDPS[1], gyroDPS[2]);
+						// printf("accel: [%+6.2f %+6.2f %+6.2f ] (G) \t", accelG.x, accelG.y, accelG.z);
+						// printf("gyro: [%+7.2f %+7.2f %+7.2f ] (º/s)\n", gyroDPS[0], gyroDPS[1], gyroDPS[2]);
 						vTaskDelay(20 / portTICK_RATE_MS);
 					}
 				});
-				// task.run(1);
+				task.run(1);
 			}
 		};
 	}

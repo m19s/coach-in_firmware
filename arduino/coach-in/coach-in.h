@@ -115,7 +115,7 @@ namespace coach_in
 			{
 				spi_stack.setup(m2d::Arduino::SPI::Stack::Mode3, m2d::Arduino::SPI::Stack::LSBFirst, SPI_CLOCK_DIV8);
 				spi_stack.set_flush_command_setting(0xff, 1);
-				spi_stack.debug_mode = true;
+				// spi_stack.debug_mode = true;
 
 				pwm.begin();
 				// Supported only 33~720Hz
@@ -173,6 +173,7 @@ namespace coach_in
 						}
 					}
 					else {
+						this->stack_flush();
 						return Invalid;
 					}
 				}
