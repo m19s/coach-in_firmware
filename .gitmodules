@@ -4,9 +4,6 @@
 [submodule "esp32/components/ESP32_StreamLogger"]
 	path = esp32/components/ESP32_StreamLogger
 	url = https://github.com/0x0c/ESP32_StreamLogger.git
-[submodule "esp32/components/ESP32_SPIWrapper"]
-	path = esp32/components/ESP32_SPIWrapper
-	url = https://github.com/0x0c/ESP32_SPIWrapper.git
 [submodule "esp32/components/WS2812-Utility"]
 	path = esp32/components/WS2812-Utility
 	url = https://github.com/0x0c/WS2812-Utility.git
