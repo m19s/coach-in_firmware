@@ -4,7 +4,6 @@
 
 #include <cstdlib>
 #include <functional>
-#include <sdkconfig.h>
 
 #include <StreamLogger/Logger.h>
 #include <WS2812-Utility/LED.h>
