@@ -5,7 +5,7 @@
 Clone these repos into your `$HOME/Documents/Arduino/libraries`.
 - [Arduino_SPI-Stack](https://github.com/0x0c/Arduino_SPI-Stack)
 - [Adafruit-PWM-Servo-Driver-Library](https://github.com/adafruit/Adafruit-PWM-Servo-Driver-Library)
-- [multi-ems](https://github.com/rkmtlab/multi-ems)
+- [multi-ems@multi-ems-cpp](https://github.com/rkmtlab/multi-ems/tree/multi-ems-cpp)
 
 ## ESP32
 ### Requirements
